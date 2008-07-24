@@ -1,4 +1,4 @@
-# $Id: gstreamer-plugins-bad.spec,v 1.1 2008/07/24 09:27:42 jwrdegoede Exp $
+# $Id: gstreamer-plugins-bad.spec,v 1.2 2008/07/24 09:51:10 jwrdegoede Exp $
 # Authority: matthias
 # ExclusiveDist: fc5 fc6 el5 fc7
 
@@ -11,7 +11,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.5
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -240,6 +240,9 @@ touch gst/modplug/libmodplug/Makefile.in
 
 
 %changelog
+* Wed Jul 23 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.5-15
+- Release bump for rpmfusion
+
 * Tue Feb  5 2008  Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.5-14
 - Add flv demuxer from CVS (livna bug 1846)
 
