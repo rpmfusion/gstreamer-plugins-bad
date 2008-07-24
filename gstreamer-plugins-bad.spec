@@ -11,13 +11,14 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
 Patch1: gstreamer-plugins-bad-0.10.5-sys-modplug.patch
 Patch2: gst-plugins-bad-0.10.5-mms-seek.patch
+Patch3: gst-plugins-bad-0.10.7-new-dirac.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -60,6 +61,8 @@ BuildRequires: libdc1394-devel
 BuildRequires: libexif-devel
 BuildRequires: libiptcdata-devel
 BuildRequires: exempi-devel
+BuildRequires: dirac-devel 
+BuildRequires: libofa-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -105,6 +108,7 @@ enough quality.
 %setup -q -n gst-plugins-bad-%{version}
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 ### we use the system version of libmodplug
 %{__rm} -r gst/modplug/libmodplug/*
 touch gst/modplug/libmodplug/Makefile.in
@@ -199,6 +203,7 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstcdaudio.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdc1394.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdfbvideosink.so
+%{_libdir}/gstreamer-%{majorminor}/libgstdirac.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdtsdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfaac.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfaad.so
@@ -211,6 +216,7 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstmusepack.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
+%{_libdir}/gstreamer-%{majorminor}/libgstofa.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
@@ -235,6 +241,10 @@ export X_LIBS=-lX11
 
 
 %changelog
+* Wed Jul 23 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.7-3
+- Release bump for rpmfusion
+- Merge changes from latest freshrpms package: enable ofa and dirac plugins
+
 * Fri Jun 27 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.7-2
 - Rebuild for new x264
 
