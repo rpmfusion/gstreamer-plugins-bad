@@ -1,0 +1,730 @@
+diff -urN gst-plugins-bad-0.10.5.orig/gst/real/gstreal.h gst-plugins-bad-0.10.5/gst/real/gstreal.h
+--- gst-plugins-bad-0.10.5.orig/gst/real/gstreal.h	1970-01-01 01:00:00.000000000 +0100
++++ gst-plugins-bad-0.10.5/gst/real/gstreal.h	2007-06-30 17:27:08.000000000 +0200
+@@ -0,0 +1,35 @@
++/* GStreamer
++ *
++ * Copyright (C) 2007 Hans de Goede <j.w.r.degoede@hhs.nl>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Library General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Library General Public License for more details.
++ *
++ * You should have received a copy of the GNU Library General Public
++ * License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++ * Boston, MA 02111-1307, USA.
++ */
++
++#ifndef __GST_REAL_H__
++#define __GST_REAL_H__
++
++#ifdef HAVE_CPU_I386
++#define DEFAULT_REAL_CODECS_PATH \
++  "/usr/lib/win32:/usr/lib/codecs:/usr/local/RealPlayer/codecs:" \
++  "/usr/local/lib/win32:/usr/local/lib/codecs"
++#endif
++#ifdef HAVE_CPU_X86_64
++#define DEFAULT_REAL_CODECS_PATH \
++  "/usr/lib64/win32:/usr/lib64/codecs:" \
++  "/usr/local/lib64/win32:/usr/local/lib64/codecs"
++#endif
++
++#endif /* __GST_REAL_H__ */
+diff -urN gst-plugins-bad-0.10.5.orig/gst/real/gstrealaudiodec.c gst-plugins-bad-0.10.5/gst/real/gstrealaudiodec.c
+--- gst-plugins-bad-0.10.5.orig/gst/real/gstrealaudiodec.c	2007-05-16 19:14:43.000000000 +0200
++++ gst-plugins-bad-0.10.5/gst/real/gstrealaudiodec.c	2007-06-30 17:27:04.000000000 +0200
+@@ -23,6 +23,7 @@
+ #include "config.h"
+ #endif
+ 
++#include "gstreal.h"
+ #include "gstrealaudiodec.h"
+ 
+ #include <string.h>
+@@ -45,28 +46,22 @@
+         "depth = (int) [ 1, MAX ], "
+         "rate = (int) [ 1, MAX ], " "channels = (int) [ 1, MAX ]"));
+ 
+-#ifdef HAVE_CPU_I386
+-#define DEFAULT_PATH "/usr/lib/win32/"
+-#endif
+-#ifdef HAVE_CPU_X86_64
+-#define DEFAULT_PATH "/usr/lib/"
+-#endif
+-
+-#define DEFAULT_PATH_RACOOK DEFAULT_PATH "cook.so.6.0"
+-#define DEFAULT_PATH_RAATRK DEFAULT_PATH "atrk.so.6.0"
+-#define DEFAULT_PATH_RA14_4 DEFAULT_PATH "14_4.so.6.0"
+-#define DEFAULT_PATH_RA28_8 DEFAULT_PATH "28_8.so.6.0"
+-#define DEFAULT_PATH_RASIPR DEFAULT_PATH "sipr.so.6.0"
++#define DEFAULT_RACOOK_NAMES "cook.so:cook.so.6.0"
++#define DEFAULT_RAATRK_NAMES "atrc.so:atrc.so.6.0"
++#define DEFAULT_RA14_4_NAMES "14_4.so.6.0"
++#define DEFAULT_RA28_8_NAMES "28_8.so.6.0"
++#define DEFAULT_RASIPR_NAMES "sipr.so:sipr.so.6.0"
+ #define DEFAULT_PWD "Ardubancel Quazanga"
+ 
+ enum
+ {
+   PROP_0,
+-  PROP_PATH_RACOOK,
+-  PROP_PATH_RAATRK,
+-  PROP_PATH_RA14_4,
+-  PROP_PATH_RA28_8,
+-  PROP_PATH_RASIPR,
++  PROP_REAL_CODECS_PATH,
++  PROP_RACOOK_NAMES,
++  PROP_RAATRK_NAMES,
++  PROP_RA14_4_NAMES,
++  PROP_RA28_8_NAMES,
++  PROP_RASIPR_NAMES,
+   PROP_PASSWORD
+ };
+ 
+@@ -121,7 +116,8 @@
+   gpointer context;
+ 
+   /* Properties */
+-  gchar *path_racook, *path_raatrk, *path_ra14_4, *path_ra28_8, *path_rasipr;
++  gchar *real_codecs_path, *racook_names, *raatrk_names, *ra14_4_names,
++    *ra28_8_names, *rasipr_names;
+   gchar *pwd;
+ };
+ 
+@@ -196,7 +192,8 @@
+   gpointer ra_close_codec, ra_decode, ra_free_decoder;
+   gpointer ra_open_codec2, ra_init_decoder, ra_set_flavor;
+   gpointer set_dll_access_path = NULL, ra_set_pwd = NULL;
+-  gchar *path;
++  gchar *path, *names;
++  gchar **split_names, **split_path;
+   gint version, flavor, channels, rate, leaf_size, packet_size, width, height;
+   guint16 res;
+   RAInit data;
+@@ -204,9 +201,10 @@
+   const GValue *v;
+   GstBuffer *buf = NULL;
+   const gchar *name = gst_structure_get_name (s);
+-  GModule *module;
++  GModule *module = NULL;
+   gpointer context = NULL;
+   RealFunctions funcs = { NULL, };
++  int i,j;
+ 
+   if (!strcmp (name, "audio/x-sipro"))
+     version = GST_REAL_AUDIO_DEC_VERSION_SIPR;
+@@ -226,28 +224,46 @@
+ 
+   if ((v = gst_structure_get_value (s, "codec_data")))
+     buf = g_value_peek_pointer (v);
+-
++  
++  path = dec->real_codecs_path ? dec->real_codecs_path :
++          DEFAULT_REAL_CODECS_PATH;
++  
+   switch (version) {
+     case GST_REAL_AUDIO_DEC_VERSION_COOK:
+-      path = dec->path_racook ? dec->path_racook : DEFAULT_PATH_RACOOK;
++      names = dec->racook_names ? dec->racook_names : DEFAULT_RACOOK_NAMES;
+       break;
+     case GST_REAL_AUDIO_DEC_VERSION_ATRK:
+-      path = dec->path_raatrk ? dec->path_raatrk : DEFAULT_PATH_RAATRK;
++      names = dec->raatrk_names ? dec->raatrk_names : DEFAULT_RAATRK_NAMES;
+       break;
+     case GST_REAL_AUDIO_DEC_VERSION_14_4:
+-      path = dec->path_ra14_4 ? dec->path_ra14_4 : DEFAULT_PATH_RA14_4;
++      names = dec->ra14_4_names ? dec->ra14_4_names : DEFAULT_RA14_4_NAMES;
+       break;
+     case GST_REAL_AUDIO_DEC_VERSION_28_8:
+-      path = dec->path_ra28_8 ? dec->path_ra28_8 : DEFAULT_PATH_RA28_8;
++      names = dec->ra28_8_names ? dec->ra28_8_names : DEFAULT_RA28_8_NAMES;
+       break;
+     case GST_REAL_AUDIO_DEC_VERSION_SIPR:
+-      path = dec->path_rasipr ? dec->path_rasipr : DEFAULT_PATH_RASIPR;
++      names = dec->rasipr_names ? dec->rasipr_names : DEFAULT_RASIPR_NAMES;
+       break;
+     default:
+       goto unknown_version;
+   }
+-
+-  module = g_module_open (path, G_MODULE_BIND_LAZY);
++  
++  split_path = g_strsplit (path, ":", 0);
++  split_names = g_strsplit (names, ":", 0);
++  
++  for (i = 0; split_path[i]; i++) {
++    for (j = 0; split_names[j]; j++) {
++      gchar *codec = g_strconcat (split_path[i], "/", split_names[j], NULL);
++      module = g_module_open (codec, G_MODULE_BIND_LAZY);
++      g_free (codec);
++      if (module)
++        goto codec_search_done;
++    }
++  }
++
++codec_search_done:
++  /* we keep the path for a while to set the dll access path */
++  g_strfreev (split_names);
+ 
+   if (module == NULL)
+     goto could_not_open;
+@@ -262,10 +278,8 @@
+   }
+ 
+   g_module_symbol (module, "RASetPwd", &ra_set_pwd);
+-
+-  if (g_module_symbol (module, "SetDLLAccessPath", &set_dll_access_path))
+-    funcs.SetDLLAccessPath (DEFAULT_PATH);
+-
++  g_module_symbol (module, "SetDLLAccessPath", &set_dll_access_path);
++  
+   funcs.RACloseCodec = ra_close_codec;
+   funcs.RADecode = ra_decode;
+   funcs.RAFreeDecoder = ra_free_decoder;
+@@ -275,6 +289,12 @@
+   funcs.RASetPwd = ra_set_pwd;
+   funcs.SetDLLAccessPath = set_dll_access_path;
+ 
++  if (funcs.SetDLLAccessPath)
++    funcs.SetDLLAccessPath (split_path[i]);
++  
++  /* now we are done with the split paths, so free them */
++  g_strfreev (split_path);
++  
+   if ((res = funcs.RAOpenCodec2 (&context, NULL))) {
+     GST_DEBUG_OBJECT (dec, "RAOpenCodec2() failed");
+     goto could_not_initialize;
+@@ -336,11 +356,12 @@
+   GST_DEBUG_OBJECT (dec, "Cannot handle version %i.", version);
+   return FALSE;
+ could_not_open:
+-  GST_DEBUG_OBJECT (dec, "Could not open library '%s': %s", path,
+-      g_module_error ());
++  g_strfreev (split_path);
++  GST_DEBUG_OBJECT (dec, "Could not find library '%s' in '%s'", names, path);
+   return FALSE;
+ could_not_load:
+   g_module_close (module);
++  g_strfreev (split_path);
+   GST_DEBUG_OBJECT (dec, "Could not load all symbols: %s", g_module_error ());
+   return FALSE;
+ could_not_initialize:
+@@ -421,25 +442,29 @@
+     dec->module = NULL;
+   }
+ 
+-  if (dec->path_racook) {
+-    g_free (dec->path_racook);
+-    dec->path_racook = NULL;
+-  }
+-  if (dec->path_raatrk) {
+-    g_free (dec->path_raatrk);
+-    dec->path_raatrk = NULL;
+-  }
+-  if (dec->path_ra14_4) {
+-    g_free (dec->path_ra14_4);
+-    dec->path_ra14_4 = NULL;
+-  }
+-  if (dec->path_ra28_8) {
+-    g_free (dec->path_ra28_8);
+-    dec->path_ra28_8 = NULL;
+-  }
+-  if (dec->path_rasipr) {
+-    g_free (dec->path_rasipr);
+-    dec->path_rasipr = NULL;
++  if (dec->real_codecs_path) {
++    g_free (dec->real_codecs_path);
++    dec->real_codecs_path = NULL;
++  }
++  if (dec->racook_names) {
++    g_free (dec->racook_names);
++    dec->racook_names = NULL;
++  }
++  if (dec->raatrk_names) {
++    g_free (dec->raatrk_names);
++    dec->raatrk_names = NULL;
++  }
++  if (dec->ra14_4_names) {
++    g_free (dec->ra14_4_names);
++    dec->ra14_4_names = NULL;
++  }
++  if (dec->ra28_8_names) {
++    g_free (dec->ra28_8_names);
++    dec->ra28_8_names = NULL;
++  }
++  if (dec->rasipr_names) {
++    g_free (dec->rasipr_names);
++    dec->rasipr_names = NULL;
+   }
+ 
+   G_OBJECT_CLASS (parent_class)->finalize (object);
+@@ -452,30 +477,35 @@
+   GstRealAudioDec *dec = GST_REAL_AUDIO_DEC (object);
+ 
+   switch (prop_id) {
+-    case PROP_PATH_RACOOK:
+-      if (dec->path_racook)
+-        g_free (dec->path_racook);
+-      dec->path_racook = g_value_dup_string (value);
+-      break;
+-    case PROP_PATH_RAATRK:
+-      if (dec->path_raatrk)
+-        g_free (dec->path_raatrk);
+-      dec->path_raatrk = g_value_dup_string (value);
+-      break;
+-    case PROP_PATH_RA14_4:
+-      if (dec->path_ra14_4)
+-        g_free (dec->path_ra14_4);
+-      dec->path_ra14_4 = g_value_dup_string (value);
+-      break;
+-    case PROP_PATH_RA28_8:
+-      if (dec->path_ra28_8)
+-        g_free (dec->path_ra28_8);
+-      dec->path_ra28_8 = g_value_dup_string (value);
+-      break;
+-    case PROP_PATH_RASIPR:
+-      if (dec->path_rasipr)
+-        g_free (dec->path_rasipr);
+-      dec->path_rasipr = g_value_dup_string (value);
++    case PROP_REAL_CODECS_PATH:
++      if (dec->real_codecs_path)
++        g_free (dec->real_codecs_path);
++      dec->real_codecs_path = g_value_dup_string (value);
++      break;
++    case PROP_RACOOK_NAMES:
++      if (dec->racook_names)
++        g_free (dec->racook_names);
++      dec->racook_names = g_value_dup_string (value);
++      break;
++    case PROP_RAATRK_NAMES:
++      if (dec->raatrk_names)
++        g_free (dec->raatrk_names);
++      dec->raatrk_names = g_value_dup_string (value);
++      break;
++    case PROP_RA14_4_NAMES:
++      if (dec->ra14_4_names)
++        g_free (dec->ra14_4_names);
++      dec->ra14_4_names = g_value_dup_string (value);
++      break;
++    case PROP_RA28_8_NAMES:
++      if (dec->ra28_8_names)
++        g_free (dec->ra28_8_names);
++      dec->ra28_8_names = g_value_dup_string (value);
++      break;
++    case PROP_RASIPR_NAMES:
++      if (dec->rasipr_names)
++        g_free (dec->rasipr_names);
++      dec->rasipr_names = g_value_dup_string (value);
+       break;
+     case PROP_PASSWORD:
+       if (dec->pwd)
+@@ -495,25 +525,29 @@
+   GstRealAudioDec *dec = GST_REAL_AUDIO_DEC (object);
+ 
+   switch (prop_id) {
+-    case PROP_PATH_RACOOK:
+-      g_value_set_string (value, dec->path_racook ? dec->path_racook :
+-          DEFAULT_PATH_RACOOK);
+-      break;
+-    case PROP_PATH_RAATRK:
+-      g_value_set_string (value, dec->path_raatrk ? dec->path_raatrk :
+-          DEFAULT_PATH_RAATRK);
+-      break;
+-    case PROP_PATH_RA14_4:
+-      g_value_set_string (value, dec->path_ra14_4 ? dec->path_ra14_4 :
+-          DEFAULT_PATH_RA14_4);
+-      break;
+-    case PROP_PATH_RA28_8:
+-      g_value_set_string (value, dec->path_ra28_8 ? dec->path_ra28_8 :
+-          DEFAULT_PATH_RA28_8);
+-      break;
+-    case PROP_PATH_RASIPR:
+-      g_value_set_string (value, dec->path_rasipr ? dec->path_rasipr :
+-          DEFAULT_PATH_RASIPR);
++    case PROP_REAL_CODECS_PATH:
++      g_value_set_string (value, dec->real_codecs_path ? dec->real_codecs_path
++          : DEFAULT_REAL_CODECS_PATH);
++      break;
++    case PROP_RACOOK_NAMES:
++      g_value_set_string (value, dec->racook_names ? dec->racook_names :
++          DEFAULT_RACOOK_NAMES);
++      break;
++    case PROP_RAATRK_NAMES:
++      g_value_set_string (value, dec->raatrk_names ? dec->raatrk_names :
++          DEFAULT_RAATRK_NAMES);
++      break;
++    case PROP_RA14_4_NAMES:
++      g_value_set_string (value, dec->ra14_4_names ? dec->ra14_4_names :
++          DEFAULT_RA14_4_NAMES);
++      break;
++    case PROP_RA28_8_NAMES:
++      g_value_set_string (value, dec->ra28_8_names ? dec->ra28_8_names :
++          DEFAULT_RA28_8_NAMES);
++      break;
++    case PROP_RASIPR_NAMES:
++      g_value_set_string (value, dec->rasipr_names ? dec->rasipr_names :
++          DEFAULT_RASIPR_NAMES);
+       break;
+     case PROP_PASSWORD:
+       g_value_set_string (value, dec->pwd ? dec->pwd : DEFAULT_PWD);
+@@ -536,21 +570,26 @@
+ 
+   element_class->change_state = gst_real_audio_dec_change_state;
+ 
+-  g_object_class_install_property (object_class, PROP_PATH_RACOOK,
+-      g_param_spec_string ("path_racook", "Path to cook driver",
+-          "Path to cook driver", DEFAULT_PATH_RACOOK, G_PARAM_READWRITE));
+-  g_object_class_install_property (object_class, PROP_PATH_RAATRK,
+-      g_param_spec_string ("path_raatrk", "Path to atrk driver",
+-          "Path to atrk driver", DEFAULT_PATH_RAATRK, G_PARAM_READWRITE));
+-  g_object_class_install_property (object_class, PROP_PATH_RA14_4,
+-      g_param_spec_string ("path_ra14_4", "Path to 14_4 driver",
+-          "Path to 14_4 driver", DEFAULT_PATH_RA14_4, G_PARAM_READWRITE));
+-  g_object_class_install_property (object_class, PROP_PATH_RA28_8,
+-      g_param_spec_string ("path_ra28_8", "Path to 28_8 driver",
+-          "Path to 28_8 driver", DEFAULT_PATH_RA28_8, G_PARAM_READWRITE));
+-  g_object_class_install_property (object_class, PROP_PATH_RASIPR,
+-      g_param_spec_string ("path_rasipr", "Path to sipr driver",
+-          "Path to sipr driver", DEFAULT_PATH_RASIPR, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_REAL_CODECS_PATH,
++      g_param_spec_string ("real_codecs_path",
++          "Path where to search for RealPlayer codecs",
++          "Path where to search for RealPlayer codecs",
++          DEFAULT_REAL_CODECS_PATH, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RACOOK_NAMES,
++      g_param_spec_string ("racook_names", "Names of cook driver",
++          "Names of cook driver", DEFAULT_RACOOK_NAMES, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RAATRK_NAMES,
++      g_param_spec_string ("raatrk_names", "Names of atrk driver",
++          "Names of atrk driver", DEFAULT_RAATRK_NAMES, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RA14_4_NAMES,
++      g_param_spec_string ("ra14_4_names", "Names of 14_4 driver",
++          "Names of 14_4 driver", DEFAULT_RA14_4_NAMES, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RA28_8_NAMES,
++      g_param_spec_string ("ra28_8_names", "Names of 28_8 driver",
++          "Names of 28_8 driver", DEFAULT_RA28_8_NAMES, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RASIPR_NAMES,
++      g_param_spec_string ("rasipr_names", "Names of sipr driver",
++          "Names of sipr driver", DEFAULT_RASIPR_NAMES, G_PARAM_READWRITE));
+   g_object_class_install_property (object_class, PROP_PASSWORD,
+       g_param_spec_string ("password", "Password",
+           "Password", DEFAULT_PWD, G_PARAM_READWRITE));
+diff -urN gst-plugins-bad-0.10.5.orig/gst/real/gstrealvideodec.c gst-plugins-bad-0.10.5/gst/real/gstrealvideodec.c
+--- gst-plugins-bad-0.10.5.orig/gst/real/gstrealvideodec.c	2007-06-06 11:11:31.000000000 +0200
++++ gst-plugins-bad-0.10.5/gst/real/gstrealvideodec.c	2007-06-30 17:27:04.000000000 +0200
+@@ -23,6 +23,7 @@
+ #include "config.h"
+ #endif
+ 
++#include "gstreal.h"
+ #include "gstrealvideodec.h"
+ 
+ #include <string.h>
+@@ -45,23 +46,17 @@
+         "framerate = (fraction) [0/1, MAX], "
+         "width = (int) [ 16, 4096 ], " "height = (int) [ 16, 4096 ] "));
+ 
+-#ifdef HAVE_CPU_I386
+-#define DEFAULT_PATH_RV20 "/usr/lib/win32/drv2.so.6.0"
+-#define DEFAULT_PATH_RV30 "/usr/lib/win32/drv3.so.6.0"
+-#define DEFAULT_PATH_RV40 "/usr/lib/win32/drv4.so.6.0"
+-#endif
+-#ifdef HAVE_CPU_X86_64
+-#define DEFAULT_PATH_RV20 "/usr/lib/drvc.so"
+-#define DEFAULT_PATH_RV30 "/usr/lib/drvc.so"
+-#define DEFAULT_PATH_RV40 "/usr/lib/drvc.so"
+-#endif
++#define DEFAULT_RV20_NAMES "drv2.so:drv2.so.6.0"
++#define DEFAULT_RV30_NAMES "drvc.so:drv3.so.6.0"
++#define DEFAULT_RV40_NAMES "drvc.so:drv4.so.6.0"
+ 
+ enum
+ {
+   PROP_0,
+-  PROP_PATH_RV20,
+-  PROP_PATH_RV30,
+-  PROP_PATH_RV40
++  PROP_REAL_CODECS_PATH,
++  PROP_RV20_NAMES,
++  PROP_RV30_NAMES,
++  PROP_RV40_NAMES
+ };
+ 
+ 
+@@ -637,65 +632,50 @@
+     GstRealVideoDecVersion version)
+ {
+   gpointer rv_custom_msg, rv_free, rv_init, rv_transform;
+-  GModule *module;
+-  gchar *path = NULL;
++  GModule *module = NULL;
++  gchar *path, *names;
++  gchar **split_names, **split_path;
++  int i, j;
+ 
+   GST_DEBUG_OBJECT (dec,
+       "Attempting to open shared library for real video version %d", version);
+ 
+-  /* FIXME : Search for the correct library in various places if dec->path_rv20
+-   *  isn't set explicitely !
+-   * Library names can also be different (ex : drv30.so vs drvc.so)
+-   */
+-
++  path = dec->real_codecs_path ? dec->real_codecs_path :
++          DEFAULT_REAL_CODECS_PATH;
++  
+   switch (version) {
+     case GST_REAL_VIDEO_DEC_VERSION_2:
+-    {
+-      if (dec->path_rv20)
+-        path = dec->path_rv20;
+-      else if (g_file_test (DEFAULT_PATH_RV20, G_FILE_TEST_EXISTS))
+-        path = DEFAULT_PATH_RV20;
+-      else if (g_file_test ("/usr/lib/drv2.so.6.0", G_FILE_TEST_EXISTS))
+-        path = "/usr/lib/drv2.so.6.0";
+-      else
+-        goto no_known_libraries;
++      names = dec->rv20_names ? dec->rv20_names : DEFAULT_RV20_NAMES;
+       break;
+-    }
+     case GST_REAL_VIDEO_DEC_VERSION_3:
+-    {
+-      if (dec->path_rv30)
+-        path = dec->path_rv30;
+-      else if (g_file_test (DEFAULT_PATH_RV30, G_FILE_TEST_EXISTS))
+-        path = DEFAULT_PATH_RV30;
+-      else if (g_file_test ("/usr/lib/drv3.so.6.0", G_FILE_TEST_EXISTS))
+-        path = "/usr/lib/drv3.so.6.0";
+-      else
+-        goto no_known_libraries;
++      names = dec->rv30_names ? dec->rv30_names : DEFAULT_RV30_NAMES;
+       break;
+-    }
+     case GST_REAL_VIDEO_DEC_VERSION_4:
+-    {
+-      if (dec->path_rv40)
+-        path = dec->path_rv40;
+-      else if (g_file_test (DEFAULT_PATH_RV40, G_FILE_TEST_EXISTS))
+-        path = DEFAULT_PATH_RV40;
+-      else if (g_file_test ("/usr/lib/drv4.so.6.0", G_FILE_TEST_EXISTS))
+-        path = "/usr/lib/drv4.so.6.0";
+-      else
+-        goto no_known_libraries;
++      names = dec->rv40_names ? dec->rv40_names : DEFAULT_RV40_NAMES;
+       break;
+-    }
+     default:
+       goto unknown_version;
+   }
+ 
+-  GST_LOG_OBJECT (dec, "Trying to open '%s'", path);
+-  hooks->module = g_module_open (path, G_MODULE_BIND_LAZY);
++  split_path = g_strsplit (path, ":", 0);
++  split_names = g_strsplit (names, ":", 0);
++  
++  for (i = 0; split_path[i]; i++) {
++    for (j = 0; split_names[j]; j++) {
++      gchar *codec = g_strconcat (split_path[i], "/", split_names[j], NULL);
++      module = g_module_open (codec, G_MODULE_BIND_LAZY);
++      g_free (codec);
++      if (module)
++        goto codec_search_done;
++    }
++  }
+ 
+-  if (hooks->module == NULL)
+-    goto could_not_open;
++codec_search_done:
++  g_strfreev (split_path);
++  g_strfreev (split_names);
+ 
+-  module = hooks->module;
++  if (module == NULL)
++    goto could_not_open;
+ 
+   /* First try opening legacy symbols, if that fails try loading new symbols */
+   if (g_module_symbol (module, "RV20toYUV420Init", &rv_init) &&
+@@ -716,17 +696,10 @@
+   hooks->free = rv_free;
+   hooks->transform = rv_transform;
+   hooks->custom_message = rv_custom_msg;
++  hooks->module = module;
+ 
+   return TRUE;
+ 
+-no_known_libraries:
+-  {
+-    GST_ELEMENT_ERROR (dec, LIBRARY, INIT,
+-        ("Couldn't find a realvideo shared library for version %d",
+-            version), (NULL));
+-    return FALSE;
+-  }
+-
+ unknown_version:
+   {
+     GST_ERROR_OBJECT (dec, "Cannot handle version %i.", version);
+@@ -735,8 +708,7 @@
+ 
+ could_not_open:
+   {
+-    GST_ERROR_OBJECT (dec, "Could not open library '%s':%s", path,
+-        g_module_error ());
++    GST_ERROR_OBJECT (dec, "Could not find library '%s' in '%s'", names, path);
+     return FALSE;
+   }
+ 
+@@ -802,17 +774,21 @@
+   close_library (dec->hooks);
+   memset (&dec->hooks, 0, sizeof (dec->hooks));
+ 
+-  if (dec->path_rv20) {
+-    g_free (dec->path_rv20);
+-    dec->path_rv20 = NULL;
+-  }
+-  if (dec->path_rv30) {
+-    g_free (dec->path_rv30);
+-    dec->path_rv30 = NULL;
+-  }
+-  if (dec->path_rv40) {
+-    g_free (dec->path_rv40);
+-    dec->path_rv40 = NULL;
++  if (dec->real_codecs_path) {
++    g_free (dec->real_codecs_path);
++    dec->real_codecs_path = NULL;
++  }
++  if (dec->rv20_names) {
++    g_free (dec->rv20_names);
++    dec->rv20_names = NULL;
++  }
++  if (dec->rv30_names) {
++    g_free (dec->rv30_names);
++    dec->rv30_names = NULL;
++  }
++  if (dec->rv40_names) {
++    g_free (dec->rv40_names);
++    dec->rv40_names = NULL;
+   }
+ 
+   G_OBJECT_CLASS (parent_class)->finalize (object);
+@@ -829,20 +805,25 @@
+    */
+ 
+   switch (prop_id) {
+-    case PROP_PATH_RV20:
+-      if (dec->path_rv20)
+-        g_free (dec->path_rv20);
+-      dec->path_rv20 = g_value_dup_string (value);
+-      break;
+-    case PROP_PATH_RV30:
+-      if (dec->path_rv30)
+-        g_free (dec->path_rv30);
+-      dec->path_rv30 = g_value_dup_string (value);
+-      break;
+-    case PROP_PATH_RV40:
+-      if (dec->path_rv40)
+-        g_free (dec->path_rv40);
+-      dec->path_rv40 = g_value_dup_string (value);
++    case PROP_REAL_CODECS_PATH:
++      if (dec->real_codecs_path)
++        g_free (dec->real_codecs_path);
++      dec->real_codecs_path = g_value_dup_string (value);
++      break;
++    case PROP_RV20_NAMES:
++      if (dec->rv20_names)
++        g_free (dec->rv20_names);
++      dec->rv20_names = g_value_dup_string (value);
++      break;
++    case PROP_RV30_NAMES:
++      if (dec->rv30_names)
++        g_free (dec->rv30_names);
++      dec->rv30_names = g_value_dup_string (value);
++      break;
++    case PROP_RV40_NAMES:
++      if (dec->rv40_names)
++        g_free (dec->rv40_names);
++      dec->rv40_names = g_value_dup_string (value);
+       break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+@@ -857,17 +838,21 @@
+   GstRealVideoDec *dec = GST_REAL_VIDEO_DEC (object);
+ 
+   switch (prop_id) {
+-    case PROP_PATH_RV20:
+-      g_value_set_string (value, dec->path_rv20 ? dec->path_rv20 :
+-          DEFAULT_PATH_RV20);
+-      break;
+-    case PROP_PATH_RV30:
+-      g_value_set_string (value, dec->path_rv30 ? dec->path_rv30 :
+-          DEFAULT_PATH_RV30);
+-      break;
+-    case PROP_PATH_RV40:
+-      g_value_set_string (value, dec->path_rv40 ? dec->path_rv40 :
+-          DEFAULT_PATH_RV40);
++    case PROP_REAL_CODECS_PATH:
++      g_value_set_string (value, dec->real_codecs_path ? dec->real_codecs_path
++          : DEFAULT_REAL_CODECS_PATH);
++      break;
++    case PROP_RV20_NAMES:
++      g_value_set_string (value, dec->rv20_names ? dec->rv20_names :
++          DEFAULT_RV20_NAMES);
++      break;
++    case PROP_RV30_NAMES:
++      g_value_set_string (value, dec->rv30_names ? dec->rv30_names :
++          DEFAULT_RV30_NAMES);
++      break;
++    case PROP_RV40_NAMES:
++      g_value_set_string (value, dec->rv40_names ? dec->rv40_names :
++          DEFAULT_RV40_NAMES);
+       break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+@@ -884,15 +869,20 @@
+   object_class->get_property = gst_real_video_dec_get_property;
+   object_class->finalize = gst_real_video_dec_finalize;
+ 
+-  g_object_class_install_property (object_class, PROP_PATH_RV20,
+-      g_param_spec_string ("path_rv20", "Path to rv20 driver",
+-          "Path to rv20 driver", DEFAULT_PATH_RV20, G_PARAM_READWRITE));
+-  g_object_class_install_property (object_class, PROP_PATH_RV30,
+-      g_param_spec_string ("path_rv30", "Path to rv30 driver",
+-          "Path to rv30 driver", DEFAULT_PATH_RV30, G_PARAM_READWRITE));
+-  g_object_class_install_property (object_class, PROP_PATH_RV40,
+-      g_param_spec_string ("path_rv40", "Path to rv40 driver",
+-          "Path to rv40 driver", DEFAULT_PATH_RV40, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_REAL_CODECS_PATH,
++      g_param_spec_string ("real_codecs_path",
++          "Path where to search for RealPlayer codecs",
++          "Path where to search for RealPlayer codecs",
++          DEFAULT_REAL_CODECS_PATH, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RV20_NAMES,
++      g_param_spec_string ("rv20_names", "Names of rv20 driver",
++          "Names of rv20 driver", DEFAULT_RV20_NAMES, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RV30_NAMES,
++      g_param_spec_string ("rv30_names", "Names of rv30 driver",
++          "Names of rv30 driver", DEFAULT_RV30_NAMES, G_PARAM_READWRITE));
++  g_object_class_install_property (object_class, PROP_RV40_NAMES,
++      g_param_spec_string ("rv40_names", "Names of rv40 driver",
++          "Names of rv40 driver", DEFAULT_RV40_NAMES, G_PARAM_READWRITE));
+ 
+   GST_DEBUG_CATEGORY_INIT (realvideode_debug, "realvideodec", 0,
+       "RealVideo decoder");
+diff -urN gst-plugins-bad-0.10.5.orig/gst/real/gstrealvideodec.h gst-plugins-bad-0.10.5/gst/real/gstrealvideodec.h
+--- gst-plugins-bad-0.10.5.orig/gst/real/gstrealvideodec.h	2007-05-06 17:25:05.000000000 +0200
++++ gst-plugins-bad-0.10.5/gst/real/gstrealvideodec.h	2007-06-30 17:27:08.000000000 +0200
+@@ -80,7 +80,7 @@
+   guint32 fragments[256];
+ 
+   /* Properties */
+-  gchar *path_rv20, *path_rv30, *path_rv40;
++  gchar *real_codecs_path, *rv20_names, *rv30_names, *rv40_names;
+ };
+ 
+ struct _GstRealVideoDecClass

@@ -1,0 +1,13 @@
+diff -up gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc~ gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc
+--- gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc~	2007-07-14 18:23:21.000000000 +0200
++++ gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc	2007-07-14 18:23:21.000000000 +0200
+@@ -119,7 +119,8 @@ static GstStaticPadTemplate modplug_sink
+ GST_STATIC_PAD_TEMPLATE ("sink",
+     GST_PAD_SINK,
+     GST_PAD_ALWAYS,
+-    GST_STATIC_CAPS ("audio/x-mod"));
++    GST_STATIC_CAPS ("audio/x-mod; audio/x-xm; audio/x-it; audio/x-s3m; "
++    "audio/x-stm"));
+ 
+ static void gst_modplug_dispose (GObject * object);
+ static void gst_modplug_set_property (GObject * object,

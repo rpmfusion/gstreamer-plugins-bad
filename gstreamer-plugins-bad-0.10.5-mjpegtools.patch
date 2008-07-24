@@ -1,0 +1,102 @@
+diff -ur gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2encoder.cc gst-plugins-bad-0.10.5.new/ext/mpeg2enc/gstmpeg2encoder.cc
+--- gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2encoder.cc	2006-07-13 13:06:45.000000000 +0200
++++ gst-plugins-bad-0.10.5.new/ext/mpeg2enc/gstmpeg2encoder.cc	2007-06-29 15:19:18.000000000 +0200
+@@ -26,7 +26,7 @@
+ 
+ #include <mpegconsts.h>
+ #include <quantize.hh>
+-#include <ratectl.hh>
++#include <ontheflyratectl.hh>
+ #include <seqencoder.hh>
+ #include <mpeg2coder.hh>
+ 
+@@ -65,10 +65,6 @@
+   /* I/O */
+   reader = new GstMpeg2EncPictureReader (element, caps, &parms);
+   reader->StreamPictureParams (strm);
+-#ifdef GST_MJPEGTOOLS_18x
+-  /* chain thread caters for reading, do not need another thread for this */
+-  options.allow_parallel_read = FALSE;
+-#endif
+   if (options.SetFormatPresets (strm)) {
+     return FALSE;
+   }
+@@ -76,11 +72,12 @@
+ 
+   /* encoding internals */
+   quantizer = new Quantizer (parms);
+-  bitrate_controller = new OnTheFlyRateCtl (parms);
++  pass1ratectl = new OnTheFlyPass1 (parms);
++  pass2ratectl = new OnTheFlyPass2 (parms);
+ #ifdef GST_MJPEGTOOLS_18x
+   /* sequencer */
+   seqencoder = new SeqEncoder (parms, *reader, *quantizer,
+-      *writer, *bitrate_controller);
++      *writer, *pass1ratectl, *pass2ratectl);
+ #else
+   coder = new MPEG2Coder (parms, *writer);
+   /* sequencer */
+Only in gst-plugins-bad-0.10.5.new/ext/mpeg2enc: gstmpeg2encoder.cc~
+diff -ur gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2encpicturereader.cc gst-plugins-bad-0.10.5.new/ext/mpeg2enc/gstmpeg2encpicturereader.cc
+--- gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2encpicturereader.cc	2006-07-13 13:06:45.000000000 +0200
++++ gst-plugins-bad-0.10.5.new/ext/mpeg2enc/gstmpeg2encpicturereader.cc	2007-06-29 15:20:44.000000000 +0200
+@@ -24,7 +24,7 @@
+ #endif
+ 
+ #include <encoderparams.hh>
+-
++#include <imageplanes.hh>
+ #include "gstmpeg2enc.hh"
+ #include "gstmpeg2encpicturereader.hh"
+ 
+@@ -79,9 +79,9 @@
+  */
+ 
+ bool
+-GstMpeg2EncPictureReader::LoadFrame ()
++GstMpeg2EncPictureReader::LoadFrame (ImagePlanes &image)
+ {
+-  gint i, x, y, n;
++  gint i, x, y;
+   guint8 *frame;
+   GstMpeg2enc *enc;
+ 
+@@ -100,23 +100,21 @@
+   }
+ 
+   frame = GST_BUFFER_DATA (enc->buffer);
+-  n = frames_read % input_imgs_buf_size;
+   x = encparams.horizontal_size;
+   y = encparams.vertical_size;
+ 
+   for (i = 0; i < y; i++) {
+-    memcpy (input_imgs_buf[n][0] + i * encparams.phy_width, frame, x);
++    memcpy (image.Plane(0) + i * encparams.phy_width, frame, x);
+     frame += x;
+   }
+-  lum_mean[n] = LumMean (input_imgs_buf[n][0]);
+   x >>= 1;
+   y >>= 1;
+   for (i = 0; i < y; i++) {
+-    memcpy (input_imgs_buf[n][1] + i * encparams.phy_chrom_width, frame, x);
++    memcpy (image.Plane(1) + i * encparams.phy_chrom_width, frame, x);
+     frame += x;
+   }
+   for (i = 0; i < y; i++) {
+-    memcpy (input_imgs_buf[n][2] + i * encparams.phy_chrom_width, frame, x);
++    memcpy (image.Plane(2) + i * encparams.phy_chrom_width, frame, x);
+     frame += x;
+   }
+   gst_buffer_unref (enc->buffer);
+diff -ur gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2encpicturereader.hh gst-plugins-bad-0.10.5.new/ext/mpeg2enc/gstmpeg2encpicturereader.hh
+--- gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2encpicturereader.hh	2006-07-13 13:06:45.000000000 +0200
++++ gst-plugins-bad-0.10.5.new/ext/mpeg2enc/gstmpeg2encpicturereader.hh	2007-06-29 15:07:19.000000000 +0200
+@@ -37,7 +37,7 @@
+ 
+ protected:
+   /* read a frame */
+-  bool LoadFrame ();
++  bool LoadFrame (ImagePlanes &image);
+ 
+ private:
+   GstElement *element;

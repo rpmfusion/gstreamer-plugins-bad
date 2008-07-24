@@ -1,0 +1,54 @@
+diff -up gst-plugins-bad-0.10.5/gst/modplug/Makefile.in~ gst-plugins-bad-0.10.5/gst/modplug/Makefile.in
+--- gst-plugins-bad-0.10.5/gst/modplug/Makefile.in~	2007-07-14 18:28:46.000000000 +0200
++++ gst-plugins-bad-0.10.5/gst/modplug/Makefile.in	2007-07-14 18:32:50.000000000 +0200
+@@ -82,7 +82,6 @@ pluginLTLIBRARIES_INSTALL = $(INSTALL)
+ LTLIBRARIES = $(plugin_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+ libgstmodplug_la_DEPENDENCIES =  \
+-	$(top_builddir)/gst/modplug/libmodplug/libmodplug.la \
+ 	$(am__DEPENDENCIES_1)
+ am_libgstmodplug_la_OBJECTS = libgstmodplug_la-gstmodplug.lo
+ libgstmodplug_la_OBJECTS = $(am_libgstmodplug_la_OBJECTS)
+@@ -492,11 +491,11 @@ sbindir = @sbindir@
+ sharedstatedir = @sharedstatedir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+-SUBDIRS = libmodplug .
++SUBDIRS = .
+ plugin_LTLIBRARIES = libgstmodplug.la
+ libgstmodplug_la_SOURCES = gstmodplug.cc
+ libgstmodplug_la_CXXFLAGS = $(GST_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS)
+-libgstmodplug_la_LIBADD = $(top_builddir)/gst/modplug/libmodplug/libmodplug.la $(GST_PLUGINS_BASE_LIBS) -lstdc++
++libgstmodplug_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lstdc++ -lmodplug
+ libgstmodplug_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ noinst_HEADERS = gstmodplug.h
+ all: all-recursive
+diff -up gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc~ gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc
+--- gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc~	2007-07-14 18:33:26.000000000 +0200
++++ gst-plugins-bad-0.10.5/gst/modplug/gstmodplug.cc	2007-07-14 18:33:26.000000000 +0200
+@@ -44,8 +44,8 @@
+ #include "config.h"
+ #endif
+ 
+-#include "libmodplug/stdafx.h"
+-#include "libmodplug/sndfile.h"
++#include <libmodplug/stdafx.h>
++#include <libmodplug/sndfile.h>
+ 
+ #include "gstmodplug.h"
+ 
+diff -up gst-plugins-bad-0.10.5/gst/modplug/Makefile.am~ gst-plugins-bad-0.10.5/gst/modplug/Makefile.am
+--- gst-plugins-bad-0.10.5/gst/modplug/Makefile.am~	2007-07-14 18:24:51.000000000 +0200
++++ gst-plugins-bad-0.10.5/gst/modplug/Makefile.am	2007-07-14 18:32:13.000000000 +0200
+@@ -1,10 +1,8 @@
+-SUBDIRS=libmodplug .
+-
+ plugin_LTLIBRARIES = libgstmodplug.la
+ 
+ libgstmodplug_la_SOURCES = gstmodplug.cc
+ libgstmodplug_la_CXXFLAGS = $(GST_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS)
+-libgstmodplug_la_LIBADD = $(top_builddir)/gst/modplug/libmodplug/libmodplug.la $(GST_PLUGINS_BASE_LIBS) -lstdc++
++libgstmodplug_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lstdc++ -lmodplug
+ libgstmodplug_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ 
+ noinst_HEADERS = gstmodplug.h
