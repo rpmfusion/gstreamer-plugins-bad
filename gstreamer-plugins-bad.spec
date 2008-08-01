@@ -10,15 +10,14 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.7
-Release: 3%{?dist}
+Version: 0.10.8
+Release: 2%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
 Patch1: gstreamer-plugins-bad-0.10.5-sys-modplug.patch
 Patch2: gst-plugins-bad-0.10.5-mms-seek.patch
-Patch3: gst-plugins-bad-0.10.7-new-dirac.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -108,7 +107,6 @@ enough quality.
 %setup -q -n gst-plugins-bad-%{version}
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 ### we use the system version of libmodplug
 %{__rm} -r gst/modplug/libmodplug/*
 touch gst/modplug/libmodplug/Makefile.in
@@ -166,7 +164,6 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstflvdemux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
 %{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstinterleave.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegtsparse.so
@@ -178,7 +175,6 @@ export X_LIBS=-lX11
 %ifarch %{ix86} x86_64
 %{_libdir}/gstreamer-%{majorminor}/libgstreal.so
 %endif
-%{_libdir}/gstreamer-%{majorminor}/libgstreplaygain.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrtpmanager.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdpelem.so
 %{_libdir}/gstreamer-%{majorminor}/libgstselector.so
@@ -241,8 +237,11 @@ export X_LIBS=-lX11
 
 
 %changelog
-* Wed Jul 23 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.7-3
-- Release bump for rpmfusion
+* Fri Aug  1 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-2
+- Release bump to keep rpmfusion version higher then livna
+
+* Fri Aug  1 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-1
+- New upstream release 0.10.8
 - Merge changes from latest freshrpms package: enable ofa and dirac plugins
 
 * Fri Jun 27 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.7-2

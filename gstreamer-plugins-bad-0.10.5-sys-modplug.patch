@@ -1,6 +1,6 @@
-diff -up gst-plugins-bad-0.10.7/gst/modplug/Makefile.am.sys-modplug gst-plugins-bad-0.10.7/gst/modplug/Makefile.am
---- gst-plugins-bad-0.10.7/gst/modplug/Makefile.am.sys-modplug	2008-02-23 16:01:32.000000000 +0100
-+++ gst-plugins-bad-0.10.7/gst/modplug/Makefile.am	2008-04-24 13:12:34.000000000 +0200
+diff -up gst-plugins-bad-0.10.8/gst/modplug/Makefile.am.foo gst-plugins-bad-0.10.8/gst/modplug/Makefile.am
+--- gst-plugins-bad-0.10.8/gst/modplug/Makefile.am.foo	2008-04-20 15:06:06.000000000 +0200
++++ gst-plugins-bad-0.10.8/gst/modplug/Makefile.am	2008-08-01 15:58:29.000000000 +0200
 @@ -1,10 +1,8 @@
 -SUBDIRS=libmodplug .
 -
@@ -13,10 +13,35 @@ diff -up gst-plugins-bad-0.10.7/gst/modplug/Makefile.am.sys-modplug gst-plugins-
  libgstmodplug_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
  
  noinst_HEADERS = gstmodplug.h
-diff -up gst-plugins-bad-0.10.7/gst/modplug/gstmodplug.cc.sys-modplug gst-plugins-bad-0.10.7/gst/modplug/gstmodplug.cc
---- gst-plugins-bad-0.10.7/gst/modplug/gstmodplug.cc.sys-modplug	2007-10-10 13:44:01.000000000 +0200
-+++ gst-plugins-bad-0.10.7/gst/modplug/gstmodplug.cc	2008-04-24 13:10:39.000000000 +0200
-@@ -44,8 +44,8 @@
+diff -up gst-plugins-bad-0.10.8/gst/modplug/Makefile.in.foo gst-plugins-bad-0.10.8/gst/modplug/Makefile.in
+--- gst-plugins-bad-0.10.8/gst/modplug/Makefile.in.foo	2008-07-31 23:54:41.000000000 +0200
++++ gst-plugins-bad-0.10.8/gst/modplug/Makefile.in	2008-08-01 16:00:44.000000000 +0200
+@@ -84,7 +84,6 @@ pluginLTLIBRARIES_INSTALL = $(INSTALL)
+ LTLIBRARIES = $(plugin_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+ libgstmodplug_la_DEPENDENCIES =  \
+-	$(top_builddir)/gst/modplug/libmodplug/libmodplug.la \
+ 	$(am__DEPENDENCIES_1)
+ am_libgstmodplug_la_OBJECTS = libgstmodplug_la-gstmodplug.lo
+ libgstmodplug_la_OBJECTS = $(am_libgstmodplug_la_OBJECTS)
+@@ -617,11 +616,11 @@ sbindir = @sbindir@
+ sharedstatedir = @sharedstatedir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+-SUBDIRS = libmodplug .
++SUBDIRS = .
+ plugin_LTLIBRARIES = libgstmodplug.la
+ libgstmodplug_la_SOURCES = gstmodplug.cc
+ libgstmodplug_la_CXXFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CXXFLAGS)
+-libgstmodplug_la_LIBADD = $(top_builddir)/gst/modplug/libmodplug/libmodplug.la $(GST_PLUGINS_BASE_LIBS) -lstdc++
++libgstmodplug_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lstdc++ -lmodplug
+ libgstmodplug_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ noinst_HEADERS = gstmodplug.h
+ all: all-recursive
+diff -up gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc.foo gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc
+--- gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc.foo	2008-07-19 15:18:20.000000000 +0200
++++ gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc	2008-08-01 15:58:29.000000000 +0200
+@@ -43,8 +43,8 @@
  #include "config.h"
  #endif
  
@@ -26,33 +51,4 @@ diff -up gst-plugins-bad-0.10.7/gst/modplug/gstmodplug.cc.sys-modplug gst-plugin
 +#include <libmodplug/sndfile.h>
  
  #include "gstmodplug.h"
- 
-diff -up gst-plugins-bad-0.10.7/gst/modplug/Makefile.in.sys-modplug gst-plugins-bad-0.10.7/gst/modplug/Makefile.in
---- gst-plugins-bad-0.10.7/gst/modplug/Makefile.in.sys-modplug	2008-04-24 01:33:17.000000000 +0200
-+++ gst-plugins-bad-0.10.7/gst/modplug/Makefile.in	2008-04-24 13:12:13.000000000 +0200
-@@ -530,13 +530,13 @@ sbindir = @sbindir@
- sharedstatedir = @sharedstatedir@
- sysconfdir = @sysconfdir@
- target_alias = @target_alias@
--SUBDIRS = libmodplug .
-+SUBDIRS = .
- 
- plugin_LTLIBRARIES = libgstmodplug.la
- 
- libgstmodplug_la_SOURCES = gstmodplug.cc
- libgstmodplug_la_CXXFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CXXFLAGS)
--libgstmodplug_la_LIBADD = $(top_builddir)/gst/modplug/libmodplug/libmodplug.la $(GST_PLUGINS_BASE_LIBS) -lstdc++
-+libgstmodplug_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lstdc++ -lmodplug
- libgstmodplug_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
- 
- noinst_HEADERS = gstmodplug.h
-@@ -547,8 +547,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
- CONFIG_CLEAN_FILES =
- LTLIBRARIES = $(plugin_LTLIBRARIES)
- 
--libgstmodplug_la_DEPENDENCIES = \
--	$(top_builddir)/gst/modplug/libmodplug/libmodplug.la
-+libgstmodplug_la_DEPENDENCIES =
- am_libgstmodplug_la_OBJECTS = libgstmodplug_la-gstmodplug.lo
- libgstmodplug_la_OBJECTS = $(am_libgstmodplug_la_OBJECTS)
  
