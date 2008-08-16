@@ -1,4 +1,4 @@
-# $Id: gstreamer-plugins-bad.spec,v 1.3 2008/08/16 07:28:54 jwrdegoede Exp $
+# $Id: gstreamer-plugins-bad.spec,v 1.4 2008/08/16 18:29:46 jwrdegoede Exp $
 # Authority: matthias
 # ExclusiveDist: fc5 fc6 el5 fc7
 
@@ -11,7 +11,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.5
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -242,6 +242,9 @@ touch gst/modplug/libmodplug/Makefile.in
 
 
 %changelog
+* Sat Aug 16 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.5-16
+- Fix build with new mjpegtools
+
 * Wed Jul 23 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.5-15
 - Release bump for rpmfusion
 
