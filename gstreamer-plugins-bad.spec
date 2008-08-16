@@ -11,7 +11,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.8
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -62,6 +62,7 @@ BuildRequires: libiptcdata-devel
 BuildRequires: exempi-devel
 BuildRequires: dirac-devel 
 BuildRequires: libofa-devel
+BuildRequires: libdvdnav-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -110,6 +111,8 @@ enough quality.
 ### we use the system version of libmodplug
 %{__rm} -r gst/modplug/libmodplug/*
 touch gst/modplug/libmodplug/Makefile.in
+# stupid dvdread includes rename <GRRR>
+sed -i 's|#include <dvdread/|#include <libdvdread/|g' ext/resindvd/resindvdsrc.h
 
 
 %build
@@ -120,11 +123,9 @@ export X_LIBS=-lX11
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
-    --enable-debug \
-    --disable-static \
-    --enable-gtk-doc \
-    --disable-ladspa
-# Don't use rpath!   
+    --enable-debug --disable-static --enable-gtk-doc \
+    --disable-ladspa --enable-experimental
+# Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 %{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 %{__make} %{?_smp_mflags}
@@ -158,6 +159,7 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace.so
+%{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfilter.so
@@ -213,6 +215,7 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstofa.so
+%{_libdir}/gstreamer-%{majorminor}/libresindvd.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
@@ -237,6 +240,9 @@ export X_LIBS=-lX11
 
 
 %changelog
+* Sat Aug 16 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-3
+- Enable DVD navigation plugin
+
 * Fri Aug  1 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-2
 - Release bump to keep rpmfusion version higher then livna
 
