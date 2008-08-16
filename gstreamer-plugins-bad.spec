@@ -1,4 +1,4 @@
-# $Id: gstreamer-plugins-bad.spec,v 1.1 2008/07/24 09:21:58 jwrdegoede Exp $
+# $Id: gstreamer-plugins-bad.spec,v 1.2 2008/08/16 06:53:22 jwrdegoede Exp $
 # Authority: matthias
 # ExclusiveDist: fc5 fc6 el5 fc7
 
@@ -18,7 +18,6 @@ URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
 Patch1: gstreamer-plugins-bad-0.10.5-sys-modplug.patch
 Patch2: gst-plugins-bad-0.10.5-mms-seek.patch
-Patch3: gst-plugins-bad-0.10.7-new-dirac.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -108,7 +107,6 @@ enough quality.
 %setup -q -n gst-plugins-bad-%{version}
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 ### we use the system version of libmodplug
 %{__rm} -r gst/modplug/libmodplug/*
 touch gst/modplug/libmodplug/Makefile.in
