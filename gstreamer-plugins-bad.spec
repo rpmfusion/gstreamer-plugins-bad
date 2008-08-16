@@ -1,4 +1,4 @@
-# $Id: gstreamer-plugins-bad.spec,v 1.2 2008/07/24 09:51:10 jwrdegoede Exp $
+# $Id: gstreamer-plugins-bad.spec,v 1.3 2008/08/16 07:28:54 jwrdegoede Exp $
 # Authority: matthias
 # ExclusiveDist: fc5 fc6 el5 fc7
 
@@ -26,6 +26,7 @@ Patch6: gstreamer-plugins-bad-gmyth.patch
 Patch7: gst-plugins-bad-0.10.5-mms-connections-speed.patch
 Patch8: gst-plugins-bad-0.10.5-mms-seek.patch
 Patch9: gst-plugins-bad-0.10.5-flv.patch
+Patch10: gst-plugins-bad-0.10.5-new-mjpegtools.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -117,6 +118,7 @@ enough quality.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 ### Use correct soundtouch pkgconfig package name
 %{__sed} -i -e 's|libSoundTouch|soundtouch-1.0|g' configure*
 ### only check minimum versions for mjpegtools and neon

@@ -1,0 +1,37 @@
+diff -up gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2enc.cc~ gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2enc.cc
+--- gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2enc.cc~	2007-12-09 21:56:17.000000000 +0100
++++ gst-plugins-bad-0.10.5/ext/mpeg2enc/gstmpeg2enc.cc	2007-12-09 21:56:17.000000000 +0100
+@@ -658,23 +658,16 @@ gst_mpeg2enc_log_callback (log_level_t l
+ {
+   GstDebugLevel gst_level;
+ 
+-  switch (level) {
+-    case LOG_NONE:
+-      gst_level = GST_LEVEL_NONE;
+-      break;
+-    case LOG_ERROR:
+-      gst_level = GST_LEVEL_ERROR;
+-      break;
+-    case LOG_INFO:
+-      gst_level = GST_LEVEL_INFO;
+-      break;
+-    case LOG_DEBUG:
+-      gst_level = GST_LEVEL_DEBUG;
+-      break;
+-    default:
+-      gst_level = GST_LEVEL_INFO;
+-      break;
+-  }
++  if (level == mjpeg_loglev_t("debug"))
++    gst_level = GST_LEVEL_DEBUG;
++  else if (level == mjpeg_loglev_t("info"))
++    gst_level = GST_LEVEL_INFO;
++  else if (level == mjpeg_loglev_t("warn"))
++    gst_level = GST_LEVEL_WARNING;
++  else if (level == mjpeg_loglev_t("error"))
++    gst_level = GST_LEVEL_ERROR;
++  else
++    gst_level = GST_LEVEL_INFO;
+ 
+   gst_debug_log (mpeg2enc_debug, gst_level, "", "", 0, NULL, message);
+ 
