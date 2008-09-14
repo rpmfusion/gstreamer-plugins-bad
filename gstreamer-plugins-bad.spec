@@ -111,8 +111,6 @@ enough quality.
 ### we use the system version of libmodplug
 %{__rm} -r gst/modplug/libmodplug/*
 touch gst/modplug/libmodplug/Makefile.in
-# stupid dvdread includes rename <GRRR>
-sed -i 's|#include <dvdread/|#include <libdvdread/|g' ext/resindvd/resindvdsrc.h
 
 
 %build
