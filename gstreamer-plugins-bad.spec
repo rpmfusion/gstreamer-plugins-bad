@@ -11,7 +11,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.8
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -240,6 +240,9 @@ export X_LIBS=-lX11
 
 
 %changelog
+* Sun Sep 14 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-4
+- Rebuild for new x264 and to generate new magic gstreamer provides
+
 * Sat Aug 16 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-3
 - Enable DVD navigation plugin
 
