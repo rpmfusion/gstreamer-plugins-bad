@@ -1,7 +1,3 @@
-# $Id: gstreamer-plugins-bad.spec 5452 2007-05-31 10:59:04Z thias $
-# Authority: matthias
-# ExclusiveDist: fc5 fc6 el5 fc7
-
 %define majorminor   0.10
 %define gstreamer    gstreamer
 
@@ -11,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.9
-Release: 2%{?dist}
+Release: 3%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -95,7 +91,7 @@ very much and require additional libraries to be installed.
 
 
 %package devel
-Summary: Development files for the GStreamer streaming media framework "bad" plug-ins
+Summary: Development files for the GStreamer media framework "bad" plug-ins
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: gstreamer-devel
@@ -104,7 +100,21 @@ Requires: gstreamer-devel
 GStreamer is a streaming media framework, based on graphs of elements which
 operate on media data.
 
-This package cocntains the development files for the plug-ins that have
+This package contains the development files for the plug-ins that have
+licensing issues, aren't tested well enough, or the code is not of good
+enough quality.
+
+
+%package devel-docs
+Summary: Development documentation for the GStreamer "bad" plug-ins
+Group: Development/Libraries
+Requires: %{name}-devel = %{version}-%{release}
+
+%description devel-docs
+GStreamer is a streaming media framework, based on graphs of elements which
+operate on media data.
+
+This package contains the development documentation for the plug-ins that have
 licensing issues, aren't tested well enough, or the code is not of good
 enough quality.
 
@@ -246,12 +256,18 @@ export X_LIBS=-lX11
 
 %files devel
 %defattr(-,root,root,-)
-%doc %{_datadir}/gtk-doc/html/gst-plugins-bad-plugins-0.10
 %{_includedir}/gstreamer-0.10/gst/app/
 %{_libdir}/libgstapp-0.10.so
 
+%files devel-docs
+%defattr(-,root,root,-)
+%doc %{_datadir}/gtk-doc/html/gst-plugins-bad-plugins-0.10
+
 
 %changelog
+* Sat Dec 27 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.9-3
+- Put devel docs in seperate subpackage to avoid multilib conflict (rf 276)
+
 * Wed Dec 17 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.9-2
 - Rebuild for new x264 (using patch from Rathann)
 
