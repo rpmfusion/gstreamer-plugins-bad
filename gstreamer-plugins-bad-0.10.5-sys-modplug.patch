@@ -1,6 +1,6 @@
-diff -up gst-plugins-bad-0.10.8/gst/modplug/Makefile.am.foo gst-plugins-bad-0.10.8/gst/modplug/Makefile.am
---- gst-plugins-bad-0.10.8/gst/modplug/Makefile.am.foo	2008-04-20 15:06:06.000000000 +0200
-+++ gst-plugins-bad-0.10.8/gst/modplug/Makefile.am	2008-08-01 15:58:29.000000000 +0200
+diff -up gst-plugins-bad-0.10.10/gst/modplug/Makefile.am.foo gst-plugins-bad-0.10.10/gst/modplug/Makefile.am
+--- gst-plugins-bad-0.10.10/gst/modplug/Makefile.am.foo	2009-01-06 11:56:05.000000000 +0100
++++ gst-plugins-bad-0.10.10/gst/modplug/Makefile.am	2009-01-21 10:01:03.000000000 +0100
 @@ -1,10 +1,8 @@
 -SUBDIRS=libmodplug .
 -
@@ -11,12 +11,12 @@ diff -up gst-plugins-bad-0.10.8/gst/modplug/Makefile.am.foo gst-plugins-bad-0.10
 -libgstmodplug_la_LIBADD = $(top_builddir)/gst/modplug/libmodplug/libmodplug.la $(GST_PLUGINS_BASE_LIBS) -lstdc++
 +libgstmodplug_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lstdc++ -lmodplug
  libgstmodplug_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ libgstmodplug_la_LIBTOOLFLAGS = --tag=disable-static
  
- noinst_HEADERS = gstmodplug.h
-diff -up gst-plugins-bad-0.10.8/gst/modplug/Makefile.in.foo gst-plugins-bad-0.10.8/gst/modplug/Makefile.in
---- gst-plugins-bad-0.10.8/gst/modplug/Makefile.in.foo	2008-07-31 23:54:41.000000000 +0200
-+++ gst-plugins-bad-0.10.8/gst/modplug/Makefile.in	2008-08-01 16:00:44.000000000 +0200
-@@ -84,7 +84,6 @@ pluginLTLIBRARIES_INSTALL = $(INSTALL)
+diff -up gst-plugins-bad-0.10.10/gst/modplug/Makefile.in.foo gst-plugins-bad-0.10.10/gst/modplug/Makefile.in
+--- gst-plugins-bad-0.10.10/gst/modplug/Makefile.in.foo	2009-01-19 23:06:17.000000000 +0100
++++ gst-plugins-bad-0.10.10/gst/modplug/Makefile.in	2009-01-21 10:02:33.000000000 +0100
+@@ -85,7 +85,6 @@ pluginLTLIBRARIES_INSTALL = $(INSTALL)
  LTLIBRARIES = $(plugin_LTLIBRARIES)
  am__DEPENDENCIES_1 =
  libgstmodplug_la_DEPENDENCIES =  \
@@ -24,10 +24,10 @@ diff -up gst-plugins-bad-0.10.8/gst/modplug/Makefile.in.foo gst-plugins-bad-0.10
  	$(am__DEPENDENCIES_1)
  am_libgstmodplug_la_OBJECTS = libgstmodplug_la-gstmodplug.lo
  libgstmodplug_la_OBJECTS = $(am_libgstmodplug_la_OBJECTS)
-@@ -617,11 +616,11 @@ sbindir = @sbindir@
- sharedstatedir = @sharedstatedir@
- sysconfdir = @sysconfdir@
+@@ -436,11 +435,11 @@ sysconfdir = @sysconfdir@
  target_alias = @target_alias@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
 -SUBDIRS = libmodplug .
 +SUBDIRS = .
  plugin_LTLIBRARIES = libgstmodplug.la
@@ -36,11 +36,11 @@ diff -up gst-plugins-bad-0.10.8/gst/modplug/Makefile.in.foo gst-plugins-bad-0.10
 -libgstmodplug_la_LIBADD = $(top_builddir)/gst/modplug/libmodplug/libmodplug.la $(GST_PLUGINS_BASE_LIBS) -lstdc++
 +libgstmodplug_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lstdc++ -lmodplug
  libgstmodplug_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ libgstmodplug_la_LIBTOOLFLAGS = --tag=disable-static
  noinst_HEADERS = gstmodplug.h
- all: all-recursive
-diff -up gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc.foo gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc
---- gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc.foo	2008-07-19 15:18:20.000000000 +0200
-+++ gst-plugins-bad-0.10.8/gst/modplug/gstmodplug.cc	2008-08-01 15:58:29.000000000 +0200
+diff -up gst-plugins-bad-0.10.10/gst/modplug/gstmodplug.cc.foo gst-plugins-bad-0.10.10/gst/modplug/gstmodplug.cc
+--- gst-plugins-bad-0.10.10/gst/modplug/gstmodplug.cc.foo	2009-01-06 11:56:05.000000000 +0100
++++ gst-plugins-bad-0.10.10/gst/modplug/gstmodplug.cc	2009-01-21 10:01:03.000000000 +0100
 @@ -43,8 +43,8 @@
  #include "config.h"
  #endif

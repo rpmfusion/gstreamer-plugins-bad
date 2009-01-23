@@ -6,8 +6,8 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.9
-Release: 3%{?dist}
+Version: 0.10.10
+Release: 1%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -15,7 +15,6 @@ URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
 Patch1: gstreamer-plugins-bad-0.10.5-sys-modplug.patch
 Patch2: gst-plugins-bad-0.10.5-mms-seek.patch
-Patch3: gstreamer-plugins-bad-x264.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -25,7 +24,6 @@ BuildRequires: check
 BuildRequires: gettext-devel
 BuildRequires: PyXML
 BuildRequires: libXt-devel
-BuildRequireS: gtk-doc
 
 BuildRequires: liboil-devel
 BuildRequires: directfb-devel
@@ -65,6 +63,9 @@ BuildRequires: jasper-devel
 BuildRequires: openssl-devel
 BuildRequires: twolame-devel
 
+# Clean up obsolete sub-packages (moved to gstreamer base)
+Obsoletes: %{name}-devel <= 0.10.9, %{name}-devel-docs <= 0.10.9
+
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
 operate on media data.
@@ -90,40 +91,10 @@ sources (mythtv), sinks (jack, nas) and effects (pitch) which are not used
 very much and require additional libraries to be installed.
 
 
-%package devel
-Summary: Development files for the GStreamer media framework "bad" plug-ins
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: gstreamer-devel
-
-%description devel
-GStreamer is a streaming media framework, based on graphs of elements which
-operate on media data.
-
-This package contains the development files for the plug-ins that have
-licensing issues, aren't tested well enough, or the code is not of good
-enough quality.
-
-
-%package devel-docs
-Summary: Development documentation for the GStreamer "bad" plug-ins
-Group: Development/Libraries
-Requires: %{name}-devel = %{version}-%{release}
-
-%description devel-docs
-GStreamer is a streaming media framework, based on graphs of elements which
-operate on media data.
-
-This package contains the development documentation for the plug-ins that have
-licensing issues, aren't tested well enough, or the code is not of good
-enough quality.
-
-
 %prep
 %setup -q -n gst-plugins-bad-%{version}
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 ### we use the system version of libmodplug
 %{__rm} -r gst/modplug/libmodplug/*
 touch gst/modplug/libmodplug/Makefile.in
@@ -137,7 +108,7 @@ export X_LIBS=-lX11
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
-    --enable-debug --disable-static --enable-gtk-doc \
+    --enable-debug --disable-static --disable-gtk-doc \
     --disable-ladspa --enable-experimental
 # Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
@@ -167,10 +138,10 @@ export X_LIBS=-lX11
 %files -f gst-plugins-bad-%{majorminor}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
-%{_libdir}/libgstapp-0.10.so.*
 # Plugins without external dependencies
+%{_libdir}/gstreamer-%{majorminor}/libgstaacparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstaiffparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstapp.so
+%{_libdir}/gstreamer-%{majorminor}/libgstamrparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdccp.so
@@ -182,15 +153,18 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstflv.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
 %{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstlegacyresample.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegdemux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegtsmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegvideoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmve.so
+%{_libdir}/gstreamer-%{majorminor}/libgstmxf.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnsf.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnuvdemux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpcapparse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstqtmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrawparse.so
 %ifarch %{ix86} x86_64
 %{_libdir}/gstreamer-%{majorminor}/libgstreal.so
@@ -200,7 +174,6 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstsdpelem.so
 %{_libdir}/gstreamer-%{majorminor}/libgstselector.so
 %{_libdir}/gstreamer-%{majorminor}/libgstspeed.so
-%{_libdir}/gstreamer-%{majorminor}/libgstspeexresample.so
 %{_libdir}/gstreamer-%{majorminor}/libgststereo.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsubenc.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttta.so
@@ -254,17 +227,15 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstnassink.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsoundtouch.so
 
-%files devel
-%defattr(-,root,root,-)
-%{_includedir}/gstreamer-0.10/gst/app/
-%{_libdir}/libgstapp-0.10.so
-
-%files devel-docs
-%defattr(-,root,root,-)
-%doc %{_datadir}/gtk-doc/html/gst-plugins-bad-plugins-0.10
-
 
 %changelog
+* Wed Jan 21 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.10-1
+- New upstream release 0.10.10
+- Drop -devel and -devel-docs subpackages now that libgstapp has moved to
+  the base plugins
+- Disable gtk-doc now that we no longer have a -devel subpackage
+- This release fixes the file conflicts with the new gstreamer-0.10.22 release
+
 * Sat Dec 27 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.9-3
 - Put devel docs in seperate subpackage to avoid multilib conflict (rf 276)
 
