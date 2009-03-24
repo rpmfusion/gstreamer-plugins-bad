@@ -6,15 +6,14 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.10
+Version: 0.10.11
 Release: 1%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
-Patch1: gstreamer-plugins-bad-0.10.5-sys-modplug.patch
-Patch2: gst-plugins-bad-0.10.5-mms-seek.patch
+Patch0: gstreamer-plugins-bad-0.10.11-celt-build-fix.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -24,6 +23,7 @@ BuildRequires: check
 BuildRequires: gettext-devel
 BuildRequires: PyXML
 BuildRequires: libXt-devel
+BuildRequireS: gtk-doc
 
 BuildRequires: liboil-devel
 BuildRequires: directfb-devel
@@ -62,9 +62,7 @@ BuildRequires: libdvdnav-devel
 BuildRequires: jasper-devel
 BuildRequires: openssl-devel
 BuildRequires: twolame-devel
-
-# Clean up obsolete sub-packages (moved to gstreamer base)
-Obsoletes: %{name}-devel <= 0.10.9, %{name}-devel-docs <= 0.10.9
+BuildRequires: celt-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -91,25 +89,50 @@ sources (mythtv), sinks (jack, nas) and effects (pitch) which are not used
 very much and require additional libraries to be installed.
 
 
+%package devel
+Summary: Development files for the GStreamer media framework "bad" plug-ins
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+Requires: gstreamer-plugins-base-devel
+
+%description devel
+GStreamer is a streaming media framework, based on graphs of elements which
+operate on media data.
+
+This package contains the development files for the plug-ins that have
+licensing issues, aren't tested well enough, or the code is not of good
+enough quality.
+
+
+%package devel-docs
+Summary: Development documentation for the GStreamer "bad" plug-ins
+Group: Development/Libraries
+Requires: %{name}-devel = %{version}-%{release}
+
+%description devel-docs
+GStreamer is a streaming media framework, based on graphs of elements which
+operate on media data.
+
+This package contains the development documentation for the plug-ins that have
+licensing issues, aren't tested well enough, or the code is not of good
+enough quality.
+
+
 %prep
 %setup -q -n gst-plugins-bad-%{version}
-%patch1 -p1
-%patch2 -p1
-### we use the system version of libmodplug
-%{__rm} -r gst/modplug/libmodplug/*
-touch gst/modplug/libmodplug/Makefile.in
+%patch0 -p1
 
 
 %build
-export HAVE_X=yes
-export X_LIBS=-lX11
-# dc1394 is disabled for now as it needs to be ported to libdc1394-2.0.1
-# (it was written for a release candidate)
+# Disable plugins moved from gst-plugins-farsight for now, until a new
+# gst-plugins-farsight release solving the conflicts is available
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
-    --enable-debug --disable-static --disable-gtk-doc \
-    --disable-ladspa --enable-experimental
+    --enable-debug --disable-static --enable-gtk-doc \
+    --disable-ladspa --enable-experimental \
+    --disable-siren --disable-valve --disable-dtmf --disable-autoconvert \
+    --disable-liveadder --disable-rtpmux
 # Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 %{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -138,18 +161,19 @@ export X_LIBS=-lX11
 %files -f gst-plugins-bad-%{majorminor}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
+%{_libdir}/libgstphotography-0.10.so.*
 # Plugins without external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstaacparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstaiffparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstamrparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
+%{_libdir}/gstreamer-%{majorminor}/libgstcamerabin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdccp.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
-%{_libdir}/gstreamer-%{majorminor}/libgstfilter.so
 %{_libdir}/gstreamer-%{majorminor}/libgstflv.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
 %{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
@@ -180,6 +204,7 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstvideosignal.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvmnc.so
 %{_libdir}/gstreamer-%{majorminor}/libgsty4menc.so
+%{_libdir}/gstreamer-%{majorminor}/libgstxdgmime.so
 
 # System (Linux) specific plugins
 %{_libdir}/gstreamer-%{majorminor}/libgstdvb.so
@@ -192,6 +217,7 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstapexsink.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbz2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdaudio.so
+%{_libdir}/gstreamer-%{majorminor}/libgstcelt.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdc1394.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdfbvideosink.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdirac.so
@@ -214,7 +240,6 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttwolame.so
 %{_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
 %{_libdir}/gstreamer-%{majorminor}/libgstx264.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
@@ -227,8 +252,26 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstnassink.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsoundtouch.so
 
+%files devel
+%defattr(-,root,root,-)
+%{_libdir}/libgstphotography-0.10.so
+%{_includedir}/gstreamer-0.10/gst/interfaces/photography*
+
+%files devel-docs
+%defattr(-,root,root,-)
+%doc %{_datadir}/gtk-doc/html/gst-plugins-bad-plugins-0.10
+
 
 %changelog
+* Sun Mar 22 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-1
+- New upstream release 0.10.11
+- Enable celt plugin (rf 380)
+- Fix broken libBPM dep (rf 412)
+- Rebuild for new soundtouch (rf 457)
+- Disable plugins moved from gst-plugins-farsight for now, until a new
+  gst-plugins-farsight release solving the conflicts is available
+- Bring back -devel and -devel-doc subdirs for new libgstphotography
+
 * Wed Jan 21 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.10-1
 - New upstream release 0.10.10
 - Drop -devel and -devel-docs subpackages now that libgstapp has moved to

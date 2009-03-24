@@ -1,0 +1,12 @@
+diff -up gst-plugins-bad-0.10.11/ext/celt/gstceltenc.c~ gst-plugins-bad-0.10.11/ext/celt/gstceltenc.c
+--- gst-plugins-bad-0.10.11/ext/celt/gstceltenc.c~	2009-01-21 11:15:41.000000000 +0100
++++ gst-plugins-bad-0.10.11/ext/celt/gstceltenc.c	2009-03-22 11:08:15.000000000 +0100
+@@ -739,7 +739,7 @@ gst_celt_enc_encode (GstCeltEnc * enc, g
+     GST_DEBUG_OBJECT (enc, "encoding %d samples (%d bytes)", frame_size, bytes);
+ 
+     outsize =
+-        celt_encode (enc->state, data, GST_BUFFER_DATA (outbuf),
++        celt_encode (enc->state, data, NULL, GST_BUFFER_DATA (outbuf),
+         bytes_per_packet);
+ 
+     g_free (data);
