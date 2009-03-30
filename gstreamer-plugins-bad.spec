@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.11
-Release: 1%{?dist}
+Release: 2%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -63,6 +63,7 @@ BuildRequires: jasper-devel
 BuildRequires: openssl-devel
 BuildRequires: twolame-devel
 BuildRequires: celt-devel
+BuildRequires: libass-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -215,6 +216,7 @@ enough quality.
 # Plugins with external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstalsaspdif.so
 %{_libdir}/gstreamer-%{majorminor}/libgstapexsink.so
+%{_libdir}/gstreamer-%{majorminor}/libgstassrender.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbz2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdaudio.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcelt.so
@@ -233,14 +235,14 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmusepack.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
+%if 0%{?fedora} >= 9
 %{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
+%endif
 %{_libdir}/gstreamer-%{majorminor}/libgstofa.so
 %{_libdir}/gstreamer-%{majorminor}/libresindvd.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
-%{_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
 %{_libdir}/gstreamer-%{majorminor}/libgstx264.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
 
@@ -251,6 +253,8 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstmythtvsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnassink.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsoundtouch.so
+%{_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
+%{_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
 
 %files devel
 %defattr(-,root,root,-)
@@ -263,6 +267,14 @@ enough quality.
 
 
 %changelog
+* Sun Mar 29 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-2
+- Rebuild for new faad2 and x264
+- Enable libass plugin
+- Move the midi plugins to the -extras package, so that people who do not
+  need / want midi playback support do not have to download 200 MB of
+  wavetable instruments. For people who do want this the automatic gstreamer
+  plugin install should take care of installing them.
+
 * Sun Mar 22 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-1
 - New upstream release 0.10.11
 - Enable celt plugin (rf 380)
