@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.11
-Release: 2%{?dist}
+Release: 3%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -131,7 +131,7 @@ enough quality.
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc \
-    --disable-ladspa --enable-experimental \
+    --disable-ladspa --enable-experimental --disable-mpegdemux \
     --disable-siren --disable-valve --disable-dtmf --disable-autoconvert \
     --disable-liveadder --disable-rtpmux
 # Don't use rpath!
@@ -181,7 +181,6 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstlegacyresample.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmpegdemux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegtsmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegvideoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmve.so
@@ -267,6 +266,10 @@ enough quality.
 
 
 %changelog
+* Fri Apr  3 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-3
+- Disable mpegdemux plugin as it conflicts with
+  gstreamer-plugins-flumpegdemux (rf 474)
+
 * Sun Mar 29 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-2
 - Rebuild for new faad2 and x264
 - Enable libass plugin
