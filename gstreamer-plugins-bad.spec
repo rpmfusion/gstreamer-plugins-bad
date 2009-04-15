@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.11
-Release: 3%{?dist}
+Release: 4%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -132,6 +132,7 @@ enough quality.
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc \
     --disable-ladspa --enable-experimental --disable-mpegdemux \
+    --disable-amrwb --disable-mimic \
     --disable-siren --disable-valve --disable-dtmf --disable-autoconvert \
     --disable-liveadder --disable-rtpmux
 # Don't use rpath!
@@ -266,6 +267,9 @@ enough quality.
 
 
 %changelog
+* Wed Apr 15 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-4
+- Rebuild for new mjpegtools
+
 * Fri Apr  3 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-3
 - Disable mpegdemux plugin as it conflicts with
   gstreamer-plugins-flumpegdemux (rf 474)
