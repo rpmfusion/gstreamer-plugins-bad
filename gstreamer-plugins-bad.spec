@@ -10,8 +10,8 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.9
-Release: 1%{?dist}
+Version: 0.10.8
+Release: 4%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -63,9 +63,6 @@ BuildRequires: exempi-devel
 BuildRequires: dirac-devel 
 BuildRequires: libofa-devel
 BuildRequires: libdvdnav-devel
-BuildRequires: jasper-devel
-BuildRequires: openssl-devel
-BuildRequires: twolame-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -156,34 +153,29 @@ export X_LIBS=-lX11
 %doc AUTHORS COPYING README REQUIREMENTS
 %{_libdir}/libgstapp-0.10.so.*
 # Plugins without external dependencies
-%{_libdir}/gstreamer-%{majorminor}/libgstaiffparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstapp.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdccp.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfilter.so
-%{_libdir}/gstreamer-%{majorminor}/libgstflv.so
+%{_libdir}/gstreamer-%{majorminor}/libgstflvdemux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
 %{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmpegdemux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmpegtsmux.so
+%{_libdir}/gstreamer-%{majorminor}/libgstmpegtsparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegvideoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmve.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnsf.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnuvdemux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstpcapparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrawparse.so
 %ifarch %{ix86} x86_64
 %{_libdir}/gstreamer-%{majorminor}/libgstreal.so
 %endif
 %{_libdir}/gstreamer-%{majorminor}/libgstrtpmanager.so
-%{_libdir}/gstreamer-%{majorminor}/libgstscaletempoplugin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdpelem.so
 %{_libdir}/gstreamer-%{majorminor}/libgstselector.so
 %{_libdir}/gstreamer-%{majorminor}/libgstspeed.so
@@ -203,7 +195,6 @@ export X_LIBS=-lX11
 
 # Plugins with external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstalsaspdif.so
-%{_libdir}/gstreamer-%{majorminor}/libgstapexsink.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbz2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdaudio.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdc1394.so
@@ -213,7 +204,6 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstfaac.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfaad.so
 %{_libdir}/gstreamer-%{majorminor}/libgstgsm.so
-%{_libdir}/gstreamer-%{majorminor}/libgstjp2k.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmms.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmetadata.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmodplug.so
@@ -228,7 +218,6 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttwolame.so
 %{_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
 %{_libdir}/gstreamer-%{majorminor}/libgstx264.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
@@ -249,10 +238,6 @@ export X_LIBS=-lX11
 
 
 %changelog
-* Sun Oct 26 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.9-1
-- New upstream release 0.10.9
-- Rebuild for new directfb
-
 * Sun Sep 14 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-4
 - Rebuild for new x264 and to generate new magic gstreamer provides
 
