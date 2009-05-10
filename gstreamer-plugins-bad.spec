@@ -11,7 +11,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.8
-Release: 4%{?dist}
+Release: 4%{?dist}.1
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -37,13 +37,15 @@ BuildRequires: faad2-devel
 BuildRequires: gsm-devel
 BuildRequires: libmpcdec-devel
 BuildRequires: SDL-devel
-BuildRequires: soundtouch-devel
+# soundtouch not in EPEL5; enable later if it becomes avilable (1/2)
+#BuildRequires: soundtouch-devel
 #BuildRequires: swfdec-devel
 Buildrequires: wavpack-devel
 BuildRequires: xvidcore-devel
 BuildRequires: bzip2-devel
 BuildRequires: mesa-libGLU-devel
-BuildRequires: neon-devel
+# needs neon >= 0.26.0, but neon in EL is 0.25.5; disable (1/2)
+# BuildRequires: neon-devel
 BuildRequires: libmms-devel
 BuildRequires: libmusicbrainz-devel
 BuildRequires: libcdaudio-devel
@@ -51,15 +53,19 @@ BuildRequires: jack-audio-connection-kit-devel
 BuildRequires: mjpegtools-devel
 BuildRequires: nas-devel
 BuildRequires: x264-devel
-BuildRequires: wildmidi-devel
+# wildmidi not in EPEL5; enable later if it becomes avilable (1/2)
+#BuildRequires: wildmidi-devel
 BuildRequires: libsndfile-devel
 BuildRequires: libmodplug-devel
-BuildRequires: libtimidity-devel
-BuildRequires: gmyth-devel >= 0.4
+# libtimidity not in EPEL5; enable later if it becomes avilable (1/2)
+#BuildRequires: libtimidity-devel
+# gmyth not in EPEL5; enable later if it becomes avilable (1/2)
+#BuildRequires: gmyth-devel >= 0.4
 BuildRequires: libdc1394-devel
 BuildRequires: libexif-devel
 BuildRequires: libiptcdata-devel
-BuildRequires: exempi-devel
+# exempi not in EPEL5; enable later if it becomes avilable (1/1)
+#BuildRequires: exempi-devel
 BuildRequires: dirac-devel 
 BuildRequires: libofa-devel
 BuildRequires: libdvdnav-devel
@@ -211,14 +217,17 @@ export X_LIBS=-lX11
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmusepack.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
-%{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
+# needs neon >= 0.26.0, but neon in EL is 0.25.5; disable (2/2)
+# {_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstofa.so
 %{_libdir}/gstreamer-%{majorminor}/libresindvd.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
-%{_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
+# libtimidity not in EPEL5; enable later if it becomes avilable (2/2)
+# {_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
+# wildmidi not in EPEL5; enable later if it becomes avilable (2/2)
+# {_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
 %{_libdir}/gstreamer-%{majorminor}/libgstx264.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
 
@@ -226,9 +235,11 @@ export X_LIBS=-lX11
 %defattr(-,root,root,-)
 # Plugins with external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstjack.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmythtvsrc.so
+# gmyth not in EPEL5; enable later if it becomes avilable (2/2)
+# {_libdir}/gstreamer-%{majorminor}/libgstmythtvsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnassink.so
-%{_libdir}/gstreamer-%{majorminor}/libgstsoundtouch.so
+# soundtouch not in EPEL5; enable later if it becomes avilable (2/2)
+# {_libdir}/gstreamer-%{majorminor}/libgstsoundtouch.so
 
 %files devel
 %defattr(-,root,root,-)
@@ -238,6 +249,15 @@ export X_LIBS=-lX11
 
 
 %changelog
+* Sun May 10 2009 Thorsten Leemhuis <feodra at leemhuis dot info> 0.10.8-4.1
+- adjust Fedora spec file for EL:
+-- don't build libgstsoundtouch.so, as soundtouch is not in EPEL
+-- don't build libgstneonhttpsrc.so, as neon in EL is to old
+-- don't build libgstwildmidi.so, as wildmidi is not in EPEL
+-- don't build libgsttimidity.so, as libtimidity is not in EPEL
+-- don't build libgstmythtvsrc.so, as gmyth is not in EPEL
+-- drop BR on exempi-devel (optional for libgstmetadata.so), as its not in EPEL
+
 * Sun Sep 14 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.8-4
 - Rebuild for new x264 and to generate new magic gstreamer provides
 
