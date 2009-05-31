@@ -1,19 +1,18 @@
 %define majorminor   0.10
 %define gstreamer    gstreamer
 
-%define gst_minver   0.10.10.1
-%define gstpb_minver 0.10.10.1
+%define gst_minver   0.10.22.1
+%define gstpb_minver 0.10.22.1
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.11
-Release: 4%{?dist}
+Version: 0.10.12
+Release: 1%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
-Patch0: gstreamer-plugins-bad-0.10.11-celt-build-fix.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -121,7 +120,6 @@ enough quality.
 
 %prep
 %setup -q -n gst-plugins-bad-%{version}
-%patch0 -p1
 
 
 %build
@@ -163,6 +161,7 @@ enough quality.
 %files -f gst-plugins-bad-%{majorminor}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
+%{_datadir}/gstreamer-%{majorminor}/presets
 %{_libdir}/libgstphotography-0.10.so.*
 # Plugins without external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstaacparse.so
@@ -172,11 +171,8 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstcamerabin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdccp.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdeinterlace2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
-%{_libdir}/gstreamer-%{majorminor}/libgstflv.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
 %{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlegacyresample.so
@@ -204,7 +200,6 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgsttta.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvideosignal.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvmnc.so
-%{_libdir}/gstreamer-%{majorminor}/libgsty4menc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxdgmime.so
 
 # System (Linux) specific plugins
@@ -246,6 +241,9 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstx264.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
 
+#debugging plugin
+%{_libdir}/gstreamer-%{majorminor}/libgstdebugutilsbad.so
+
 %files extras
 %defattr(-,root,root,-)
 # Plugins with external dependencies
@@ -267,6 +265,10 @@ enough quality.
 
 
 %changelog
+* Sun May 31 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.12-1
+- New upstream release 0.10.12
+- Resolves rf 622, rf 592
+
 * Wed Apr 15 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.11-4
 - Rebuild for new mjpegtools
 
