@@ -6,8 +6,8 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.12
-Release: 2%{?dist}
+Version: 0.10.13
+Release: 1%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -45,7 +45,6 @@ BuildRequires: libcdaudio-devel
 BuildRequires: jack-audio-connection-kit-devel
 BuildRequires: mjpegtools-devel
 BuildRequires: nas-devel
-BuildRequires: x264-devel
 BuildRequires: wildmidi-devel
 BuildRequires: libsndfile-devel
 BuildRequires: libmodplug-devel
@@ -130,7 +129,7 @@ enough quality.
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc \
     --disable-ladspa --enable-experimental --disable-mpegdemux \
-    --disable-amrwb --disable-mimic \
+    --disable-amrwb --disable-selector --disable-mimic \
     --disable-siren --disable-valve --disable-dtmf --disable-autoconvert \
     --disable-liveadder --disable-rtpmux
 # Don't use rpath!
@@ -161,10 +160,10 @@ enough quality.
 %files -f gst-plugins-bad-%{majorminor}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
-%{_datadir}/gstreamer-%{majorminor}/presets
 %{_libdir}/libgstphotography-0.10.so.*
 # Plugins without external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstaacparse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstadpcmdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgstaiffparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstamrparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
@@ -175,6 +174,8 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
 %{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
+%{_libdir}/gstreamer-%{majorminor}/libgsthdvparse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstid3tag.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlegacyresample.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
@@ -193,7 +194,7 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstrtpmanager.so
 %{_libdir}/gstreamer-%{majorminor}/libgstscaletempoplugin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdpelem.so
-%{_libdir}/gstreamer-%{majorminor}/libgstselector.so
+%{_libdir}/gstreamer-%{majorminor}/libgstshapewipe.so
 %{_libdir}/gstreamer-%{majorminor}/libgstspeed.so
 %{_libdir}/gstreamer-%{majorminor}/libgststereo.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsubenc.so
@@ -238,7 +239,6 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgstx264.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
 
 #debugging plugin
@@ -265,6 +265,11 @@ enough quality.
 
 
 %changelog
+* Fri Jun 19 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-1
+- New upstream release 0.10.13
+- Disable input-selector plugin as it has been added to Fedora's
+  gstreamer-plugins-base as rythmbox needs it
+
 * Wed Jun 17 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.12-2
 - Rebuild for changes in the gstreamer provides script
 
