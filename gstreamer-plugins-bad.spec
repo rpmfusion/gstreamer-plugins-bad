@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 1%{?dist}
+Release: 2%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -125,12 +125,15 @@ enough quality.
 # Disable ladspa, selector & mpegdemux, they are patched into Fedora's packages
 # Disable amrwb as it does not belong in rpmfusion-free
 # Disable libmimic plugin until libmimic is reviewed
+# Disable other farsight plugins, they are patched into Fedora's packages
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc --enable-experimental \
     --disable-ladspa --disable-mpegdemux --disable-selector \
-    --disable-amrwb --disable-mimic
+    --disable-amrwb --disable-mimic \
+    --disable-siren --disable-valve --disable-dtmf --disable-autoconvert \
+    --disable-liveadder --disable-rtpmux
 # Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 %{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -270,6 +273,10 @@ enough quality.
 
 
 %changelog
+* Tue Jun 23 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-2
+- Disable farsight plugins again, they have been added to Fedora's
+  gstreamer-plugins-good package
+
 * Fri Jun 19 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-1
 - New upstream release 0.10.13
 - Disable input-selector plugin as it has been added to Fedora's
