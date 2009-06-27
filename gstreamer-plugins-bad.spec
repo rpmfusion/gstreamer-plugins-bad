@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 2%{?dist}
+Release: 3%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -133,7 +133,7 @@ enough quality.
     --disable-ladspa --disable-mpegdemux --disable-selector \
     --disable-amrwb --disable-mimic \
     --disable-siren --disable-valve --disable-dtmf --disable-autoconvert \
-    --disable-liveadder --disable-rtpmux
+    --disable-liveadder --disable-rtpmux --disable-rtpmanager
 # Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 %{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -168,12 +168,10 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstadpcmdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgstaiffparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstamrparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstautoconvert.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcamerabin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdccp.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdtmf.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
@@ -181,7 +179,6 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgsthdvparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstid3tag.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlegacyresample.so
-%{_libdir}/gstreamer-%{majorminor}/libgstliveadder.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegtsmux.so
@@ -196,17 +193,13 @@ enough quality.
 %ifarch %{ix86} x86_64
 %{_libdir}/gstreamer-%{majorminor}/libgstreal.so
 %endif
-%{_libdir}/gstreamer-%{majorminor}/libgstrtpmanager.so
-%{_libdir}/gstreamer-%{majorminor}/libgstrtpmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstscaletempoplugin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdpelem.so
 %{_libdir}/gstreamer-%{majorminor}/libgstshapewipe.so
-%{_libdir}/gstreamer-%{majorminor}/libgstsiren.so
 %{_libdir}/gstreamer-%{majorminor}/libgstspeed.so
 %{_libdir}/gstreamer-%{majorminor}/libgststereo.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsubenc.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttta.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvalve.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvideosignal.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvmnc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxdgmime.so
@@ -273,6 +266,9 @@ enough quality.
 
 
 %changelog
+* Sat Jun 27 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-3
+- Disable rtpmanager as it also has been added to gstreamer-plugins-good (#689)
+
 * Tue Jun 23 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-2
 - Disable farsight plugins again, they have been added to Fedora's
   gstreamer-plugins-good package
