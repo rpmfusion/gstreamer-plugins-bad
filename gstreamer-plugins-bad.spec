@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 3%{?dist}
+Release: 4%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -266,6 +266,9 @@ enough quality.
 
 
 %changelog
+* Tue Jul 07 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 0.10.13-4
+- rebuild for new directfb
+
 * Sat Jun 27 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-3
 - Disable rtpmanager as it also has been added to gstreamer-plugins-good (#689)
 
