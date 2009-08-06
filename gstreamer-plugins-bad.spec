@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 3%{?dist}
+Release: 5%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -132,7 +132,7 @@ enough quality.
     --enable-debug --disable-static --enable-gtk-doc --enable-experimental \
     --disable-ladspa --disable-mpegdemux --disable-selector \
     --disable-amrwb --disable-mimic \
-    --disable-siren --disable-valve --disable-dtmf --disable-autoconvert \
+    --disable-valve --disable-dtmf --disable-autoconvert \
     --disable-liveadder --disable-rtpmux --disable-rtpmanager
 # Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
@@ -196,6 +196,7 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstscaletempoplugin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdpelem.so
 %{_libdir}/gstreamer-%{majorminor}/libgstshapewipe.so
+%{_libdir}/gstreamer-%{majorminor}/libgstsiren.so
 %{_libdir}/gstreamer-%{majorminor}/libgstspeed.so
 %{_libdir}/gstreamer-%{majorminor}/libgststereo.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsubenc.so
@@ -266,6 +267,12 @@ enough quality.
 
 
 %changelog
+* Thu Aug  6 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-5
+- Re-enable siren as it also has not been added to gst-plugins-good (#749)
+
+* Tue Jul 07 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 0.10.13-4
+- rebuild for new directfb
+
 * Sat Jun 27 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-3
 - Disable rtpmanager as it also has been added to gstreamer-plugins-good (#689)
 
