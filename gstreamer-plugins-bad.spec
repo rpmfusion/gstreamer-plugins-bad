@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 5%{?dist}
+Release: 6%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -62,6 +62,7 @@ BuildRequires: openssl-devel
 BuildRequires: twolame-devel
 BuildRequires: celt-devel
 BuildRequires: libass-devel
+BuildRequires: libmimic-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -131,7 +132,7 @@ enough quality.
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc --enable-experimental \
     --disable-ladspa --disable-mpegdemux --disable-selector \
-    --disable-amrwb --disable-mimic \
+    --disable-amrwb \
     --disable-valve --disable-dtmf --disable-autoconvert \
     --disable-liveadder --disable-rtpmux --disable-rtpmanager
 # Don't use rpath!
@@ -228,6 +229,7 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstjp2k.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmms.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmetadata.so
+%{_libdir}/gstreamer-%{majorminor}/libgstmimic.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmodplug.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg2enc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
@@ -267,6 +269,9 @@ enough quality.
 
 
 %changelog
+* Tue Aug 11 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-6
+- Enable mimic plugin now that we have libmimic in RPM Fusion
+
 * Thu Aug  6 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-5
 - Re-enable siren as it also has not been added to gst-plugins-good (#749)
 
