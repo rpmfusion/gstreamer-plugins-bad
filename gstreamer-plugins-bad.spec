@@ -7,12 +7,13 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 6%{?dist}
+Release: 7%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
+Patch0: gst-new-ass-api.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -120,6 +121,7 @@ enough quality.
 
 %prep
 %setup -q -n gst-plugins-bad-%{version}
+%patch0 -p1
 
 
 %build
@@ -269,6 +271,9 @@ enough quality.
 
 
 %changelog
+* Mon Aug 31 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-7
+- Rebuild for new libass
+
 * Tue Aug 11 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-6
 - Enable mimic plugin now that we have libmimic in RPM Fusion
 
