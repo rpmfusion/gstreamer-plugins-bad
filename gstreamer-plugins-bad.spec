@@ -11,7 +11,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.9
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -249,6 +249,9 @@ export X_LIBS=-lX11
 
 
 %changelog
+* Wed Sep 30 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 0.10.9-2
+- rebuilt
+
 * Sun Oct 26 2008 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.9-1
 - New upstream release 0.10.9
 - Rebuild for new directfb
