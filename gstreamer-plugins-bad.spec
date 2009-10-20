@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 7%{?dist}
+Release: 8%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -271,6 +271,9 @@ enough quality.
 
 
 %changelog
+* Tue Oct 20 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 0.10.13-8
+- rebuilt
+
 * Mon Aug 31 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-7
 - Rebuild for new libass
 
