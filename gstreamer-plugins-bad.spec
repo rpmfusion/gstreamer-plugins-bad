@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 8%{?dist}
+Release: 9%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -237,9 +237,9 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmusepack.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
-%if 0%{?fedora} >= 9
-%{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
-%endif
+#if 0%{?fedora} >= 9
+#{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
+#endif
 %{_libdir}/gstreamer-%{majorminor}/libgstofa.so
 %{_libdir}/gstreamer-%{majorminor}/libresindvd.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
@@ -271,6 +271,9 @@ enough quality.
 
 
 %changelog
+* Tue Oct 20 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 0.10.13-9
+- disable libgstneonhttpsrc
+
 * Tue Oct 20 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 0.10.13-8
 - rebuilt
 
