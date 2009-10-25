@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.13
-Release: 9%{?dist}
+Release: 10%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -28,7 +28,6 @@ BuildRequireS: gtk-doc
 BuildRequires: liboil-devel
 BuildRequires: directfb-devel
 BuildRequires: libdca-devel
-BuildRequires: faac-devel
 BuildRequires: faad2-devel
 BuildRequires: gsm-devel
 BuildRequires: libmpcdec-devel
@@ -126,15 +125,14 @@ enough quality.
 
 %build
 # Disable ladspa, selector & mpegdemux, they are patched into Fedora's packages
-# Disable amrwb as it does not belong in rpmfusion-free
-# Disable libmimic plugin until libmimic is reviewed
-# Disable other farsight plugins, they are patched into Fedora's packages
+# Disable amrwb and faac as they do not belong in rpmfusion-free
+# Disable farsight plugins, they are patched into Fedora's packages
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc --enable-experimental \
     --disable-ladspa --disable-mpegdemux --disable-selector \
-    --disable-amrwb \
+    --disable-amrwb --disable-faac \
     --disable-valve --disable-dtmf --disable-autoconvert \
     --disable-liveadder --disable-rtpmux --disable-rtpmanager
 # Don't use rpath!
@@ -225,7 +223,6 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstdfbvideosink.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdirac.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdtsdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgstfaac.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfaad.so
 %{_libdir}/gstreamer-%{majorminor}/libgstgsm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstjp2k.so
@@ -271,6 +268,10 @@ enough quality.
 
 
 %changelog
+* Sun Oct 25 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-10
+- Disable faac AAC (MPEG 2 / 4 audio) encode plugin as faac was moved to
+  non free (rf 898)
+
 * Tue Oct 20 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 0.10.13-9
 - disable libgstneonhttpsrc
 
