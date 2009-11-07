@@ -6,14 +6,14 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.13
-Release: 10%{?dist}
+Version: 0.10.16
+Release: 1%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
-Patch0: gst-new-ass-api.patch
+Patch0: gst-plugins-bad-0.10.16-celt-compile-fixes.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -63,6 +63,10 @@ BuildRequires: twolame-devel
 BuildRequires: celt-devel
 BuildRequires: libass-devel
 BuildRequires: libmimic-devel
+BuildRequires: zbar-devel
+BuildRequires: libkate-devel
+BuildRequires: slv2-devel
+BuildRequires: librsvg2-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -124,17 +128,18 @@ enough quality.
 
 
 %build
-# Disable ladspa, selector & mpegdemux, they are patched into Fedora's packages
-# Disable amrwb and faac as they do not belong in rpmfusion-free
+# Disable ladspa, selector, mpegdemux and schroedinger,
+#  they are patched into Fedora's packages
+# Disable amrwb (enc), faac and vdpau as they do not belong in rpmfusion-free
 # Disable farsight plugins, they are patched into Fedora's packages
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc --enable-experimental \
-    --disable-ladspa --disable-mpegdemux --disable-selector \
-    --disable-amrwb --disable-faac \
+    --disable-ladspa --disable-mpegdemux --disable-selector --disable-schro \
+    --disable-amrwb --disable-faac --disable-vdpau \
     --disable-valve --disable-dtmf --disable-autoconvert \
-    --disable-liveadder --disable-rtpmux --disable-rtpmanager
+    --disable-liveadder --disable-rtpmux
 # Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 %{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -163,12 +168,18 @@ enough quality.
 %files -f gst-plugins-bad-%{majorminor}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
-%{_libdir}/libgstphotography-0.10.so.*
+%{_bindir}/gst-camera
+%{_bindir}/gst-camera-perf
+%{_datadir}/gstreamer-%{majorminor}
+%{_libdir}/libgstbasevideo-%{majorminor}.so.*
+%{_libdir}/libgstphotography-%{majorminor}.so.*
+%{_libdir}/libgstsignalprocessor-%{majorminor}.so.*
 # Plugins without external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstaacparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstadpcmdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgstaiffparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstamrparse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstasfmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcamerabin.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
@@ -176,12 +187,14 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
+%{_libdir}/gstreamer-%{majorminor}/libgstfrei0r.so
 %{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
 %{_libdir}/gstreamer-%{majorminor}/libgsthdvparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstid3tag.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlegacyresample.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstmpegpsmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegtsmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegvideoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmve.so
@@ -189,6 +202,7 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstnsf.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnuvdemux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpcapparse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstpnm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstqtmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrawparse.so
 %ifarch %{ix86} x86_64
@@ -202,9 +216,9 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgststereo.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsubenc.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttta.so
+%{_libdir}/gstreamer-%{majorminor}/libgstvideomeasure.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvideosignal.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvmnc.so
-%{_libdir}/gstreamer-%{majorminor}/libgstxdgmime.so
 
 # System (Linux) specific plugins
 %{_libdir}/gstreamer-%{majorminor}/libgstdvb.so
@@ -226,6 +240,8 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstfaad.so
 %{_libdir}/gstreamer-%{majorminor}/libgstgsm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstjp2k.so
+%{_libdir}/gstreamer-%{majorminor}/libgstkate.so
+%{_libdir}/gstreamer-%{majorminor}/libgstlv2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmms.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmetadata.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmimic.so
@@ -233,19 +249,21 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg2enc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmusepack.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
 #if 0%{?fedora} >= 9
-#{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
+%{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
 #endif
 %{_libdir}/gstreamer-%{majorminor}/libgstofa.so
-%{_libdir}/gstreamer-%{majorminor}/libresindvd.so
+%{_libdir}/gstreamer-%{majorminor}/libgstrsvg.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
+%{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
+%{_libdir}/gstreamer-%{majorminor}/libresindvd.so
 
 #debugging plugin
 %{_libdir}/gstreamer-%{majorminor}/libgstdebugutilsbad.so
+
 
 %files extras
 %defattr(-,root,root,-)
@@ -257,17 +275,26 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
 %{_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
 
+
 %files devel
 %defattr(-,root,root,-)
-%{_libdir}/libgstphotography-0.10.so
-%{_includedir}/gstreamer-0.10/gst/interfaces/photography*
+%{_libdir}/libgstbasevideo-%{majorminor}.so
+%{_libdir}/libgstphotography-%{majorminor}.so
+%{_libdir}/libgstsignalprocessor-%{majorminor}.so
+%{_includedir}/gstreamer-%{majorminor}/gst/interfaces/photography*
+%{_includedir}/gstreamer-%{majorminor}/gst/signalprocessor
+%{_includedir}/gstreamer-%{majorminor}/gst/video
+
 
 %files devel-docs
 %defattr(-,root,root,-)
-%doc %{_datadir}/gtk-doc/html/gst-plugins-bad-plugins-0.10
+%doc %{_datadir}/gtk-doc/html/gst-plugins-bad-plugins-%{majorminor}
 
 
 %changelog
+* Sat Nov  7 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.16-1
+- New upstream release 0.10.16
+
 * Sun Oct 25 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.13-10
 - Disable faac AAC (MPEG 2 / 4 audio) encode plugin as faac was moved to
   non free (rf 898)
