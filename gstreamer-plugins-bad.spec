@@ -24,6 +24,8 @@ BuildRequires: gettext-devel
 BuildRequires: PyXML
 BuildRequires: libXt-devel
 BuildRequireS: gtk-doc
+# for gstcamera
+BuildRequires: libglade2-devel
 
 BuildRequires: liboil-devel
 BuildRequires: directfb-devel
