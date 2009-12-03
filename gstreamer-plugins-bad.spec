@@ -6,14 +6,13 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.16
+Version: 0.10.17
 Release: 1%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
-Patch0: gst-plugins-bad-0.10.16-celt-compile-fixes.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -126,7 +125,6 @@ enough quality.
 
 %prep
 %setup -q -n gst-plugins-bad-%{version}
-%patch0 -p1
 
 
 %build
@@ -179,7 +177,7 @@ enough quality.
 # Plugins without external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstaacparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstadpcmdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgstaiffparse.so
+%{_libdir}/gstreamer-%{majorminor}/libgstaiff.so
 %{_libdir}/gstreamer-%{majorminor}/libgstamrparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstasfmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
@@ -261,6 +259,7 @@ enough quality.
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
+%{_libdir}/gstreamer-%{majorminor}/libgstzbar.so
 %{_libdir}/gstreamer-%{majorminor}/libresindvd.so
 
 #debugging plugin
@@ -294,6 +293,9 @@ enough quality.
 
 
 %changelog
+* Wed Nov 18 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-1
+- New upstream release 0.10.17
+
 * Sat Nov  7 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.16-1
 - New upstream release 0.10.16
 
