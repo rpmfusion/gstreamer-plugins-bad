@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.17
-Release: 1%{?dist}
+Release: 2%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -68,6 +68,7 @@ BuildRequires: zbar-devel
 BuildRequires: libkate-devel
 BuildRequires: slv2-devel
 BuildRequires: librsvg2-devel
+BuildRequires: ladspa-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -128,15 +129,14 @@ enough quality.
 
 
 %build
-# Disable ladspa, selector, mpegdemux and schroedinger,
-#  they are patched into Fedora's packages
+# Disable selector, mpegdemux and schroedinger, they are patched into Fedora
 # Disable amrwb (enc), faac and vdpau as they do not belong in rpmfusion-free
 # Disable farsight plugins, they are patched into Fedora's packages
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
     --enable-debug --disable-static --enable-gtk-doc --enable-experimental \
-    --disable-ladspa --disable-mpegdemux --disable-selector --disable-schro \
+    --disable-mpegdemux --disable-selector --disable-schro \
     --disable-amrwb --disable-faac --disable-vdpau \
     --disable-valve --disable-dtmf --disable-autoconvert \
     --disable-liveadder --disable-rtpmux
@@ -241,6 +241,7 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstgsm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstjp2k.so
 %{_libdir}/gstreamer-%{majorminor}/libgstkate.so
+%{_libdir}/gstreamer-%{majorminor}/libgstladspa.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlv2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmms.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmetadata.so
@@ -293,6 +294,9 @@ enough quality.
 
 
 %changelog
+* Fri Dec  4 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-2
+- Enable LADSPA plugins (#992)
+
 * Wed Nov 18 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-1
 - New upstream release 0.10.17
 
