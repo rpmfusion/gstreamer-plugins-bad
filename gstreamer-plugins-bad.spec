@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.17
-Release: 2%{?dist}
+Release: 3%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 Group: Applications/Multimedia
@@ -41,7 +41,6 @@ BuildRequires: bzip2-devel
 BuildRequires: mesa-libGLU-devel
 BuildRequires: neon-devel
 BuildRequires: libmms-devel
-BuildRequires: libmusicbrainz-devel
 BuildRequires: libcdaudio-devel
 BuildRequires: jack-audio-connection-kit-devel
 BuildRequires: mjpegtools-devel
@@ -132,6 +131,7 @@ enough quality.
 # Disable selector, mpegdemux and schroedinger, they are patched into Fedora
 # Disable amrwb (enc), faac and vdpau as they do not belong in rpmfusion-free
 # Disable farsight plugins, they are patched into Fedora's packages
+# Disable musicbrainz plugin, the musicbrainz servers are decommissioned
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
@@ -139,7 +139,8 @@ enough quality.
     --disable-mpegdemux --disable-selector --disable-schro \
     --disable-amrwb --disable-faac --disable-vdpau \
     --disable-valve --disable-dtmf --disable-autoconvert \
-    --disable-liveadder --disable-rtpmux
+    --disable-liveadder --disable-rtpmux \
+    --disable-musicbrainz
 # Don't use rpath!
 %{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 %{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -258,7 +259,6 @@ enough quality.
 %{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
 #%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
 %{_libdir}/gstreamer-%{majorminor}/libgstzbar.so
 %{_libdir}/gstreamer-%{majorminor}/libresindvd.so
@@ -294,6 +294,9 @@ enough quality.
 
 
 %changelog
+* Sat Dec 19 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-3
+- Disable muscbrainz / trm plugin (#1001)
+
 * Fri Dec  4 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-2
 - Enable LADSPA plugins (#992)
 
