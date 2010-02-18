@@ -4,17 +4,22 @@
 %define gst_minver   0.10.22.1
 %define gstpb_minver 0.10.22.1
 
+# which plugins to actually build and install
+%define gstdirs gst/asfmux gst/dvdspu gst/mpegpsmux gst/mpegtsmux gst/qtmux gst/real gst/siren
+%define extdirs ext/dts ext/faad ext/libmms ext/mimic ext/mpeg2enc ext/mplex ext/xvid
+
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.17
-Release: 2%{?dist}
-# The freeze and nfs plugins are LGPLv2 (only)
-License: LGPLv2+ and LGPLv2
+Release: 4%{?dist}
+License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: %{gstreamer} >= %{gst_minver}
+# Drag in the free plugins which are in Fedora now, for upgrade path
+Requires: gstreamer-plugins-bad-free >= %{version}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
 BuildRequires: %{gstreamer}-plugins-base-devel >= %{gstpb_minver}
 
@@ -23,52 +28,14 @@ BuildRequires: gettext-devel
 BuildRequires: PyXML
 BuildRequires: libXt-devel
 BuildRequireS: gtk-doc
-# for gstcamera
-BuildRequires: libglade2-devel
-
 BuildRequires: liboil-devel
-BuildRequires: directfb-devel
 BuildRequires: libdca-devel
 BuildRequires: faad2-devel
-BuildRequires: gsm-devel
-BuildRequires: libmpcdec-devel
-BuildRequires: SDL-devel
-BuildRequires: soundtouch-devel
-#BuildRequires: swfdec-devel
-Buildrequires: wavpack-devel
 BuildRequires: xvidcore-devel
-BuildRequires: bzip2-devel
-BuildRequires: mesa-libGLU-devel
-BuildRequires: neon-devel
 BuildRequires: libmms-devel
-BuildRequires: libmusicbrainz-devel
-BuildRequires: libcdaudio-devel
-BuildRequires: jack-audio-connection-kit-devel
 BuildRequires: mjpegtools-devel
-BuildRequires: nas-devel
-BuildRequires: wildmidi-devel
-BuildRequires: libsndfile-devel
-BuildRequires: libmodplug-devel
-BuildRequires: libtimidity-devel
-BuildRequires: gmyth-devel >= 0.4
-BuildRequires: libdc1394-devel
-BuildRequires: libexif-devel
-BuildRequires: libiptcdata-devel
-BuildRequires: exempi-devel
-BuildRequires: dirac-devel 
-BuildRequires: libofa-devel
-BuildRequires: libdvdnav-devel
-BuildRequires: jasper-devel
-BuildRequires: openssl-devel
 BuildRequires: twolame-devel
-BuildRequires: celt-devel
-BuildRequires: libass-devel
 BuildRequires: libmimic-devel
-BuildRequires: zbar-devel
-BuildRequires: libkate-devel
-BuildRequires: slv2-devel
-BuildRequires: librsvg2-devel
-BuildRequires: ladspa-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -78,222 +45,77 @@ This package contains plug-ins that have licensing issues, aren't tested
 well enough, or the code is not of good enough quality.
 
 
-%package extras
-Summary: Extra GStreamer "bad" plugins (less often used "bad" plugins)
-Group: Applications/Multimedia
-Requires: %{name} = %{version}-%{release}
-
-%description extras
-GStreamer is a streaming media framework, based on graphs of elements which
-operate on media data.
-
-gstreamer-plugins-bad contains plug-ins that have licensing issues, aren't
-tested well enough, or the code is not of good enough quality.
-
-This package (gstreamer-plugins-bad-extras) contains extra "bad" plugins for
-sources (mythtv), sinks (jack, nas) and effects (pitch) which are not used
-very much and require additional libraries to be installed.
-
-
-%package devel
-Summary: Development files for the GStreamer media framework "bad" plug-ins
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: gstreamer-plugins-base-devel
-
-%description devel
-GStreamer is a streaming media framework, based on graphs of elements which
-operate on media data.
-
-This package contains the development files for the plug-ins that have
-licensing issues, aren't tested well enough, or the code is not of good
-enough quality.
-
-
-%package devel-docs
-Summary: Development documentation for the GStreamer "bad" plug-ins
-Group: Development/Libraries
-Requires: %{name}-devel = %{version}-%{release}
-
-%description devel-docs
-GStreamer is a streaming media framework, based on graphs of elements which
-operate on media data.
-
-This package contains the development documentation for the plug-ins that have
-licensing issues, aren't tested well enough, or the code is not of good
-enough quality.
-
-
 %prep
 %setup -q -n gst-plugins-bad-%{version}
 
 
 %build
-# Disable selector, mpegdemux and schroedinger, they are patched into Fedora
-# Disable amrwb (enc), faac and vdpau as they do not belong in rpmfusion-free
-# Disable farsight plugins, they are patched into Fedora's packages
+# Note we don't bother with disabling everything which is in Fedora, that
+# is unmaintainable, instead we selectively run make in subdirs
 %configure \
     --with-package-name="gst-plugins-bad rpmfusion rpm" \
     --with-package-origin="http://rpmfusion.org/" \
-    --enable-debug --disable-static --enable-gtk-doc --enable-experimental \
-    --disable-mpegdemux --disable-selector --disable-schro \
-    --disable-amrwb --disable-faac --disable-vdpau \
-    --disable-valve --disable-dtmf --disable-autoconvert \
-    --disable-liveadder --disable-rtpmux
+    --enable-debug --disable-static --enable-experimental
 # Don't use rpath!
-%{__sed} -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-%{__sed} -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-%{__make} %{?_smp_mflags}
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+for i in %{gstdirs} %{extdirs}; do
+    pushd $i
+    make %{?_smp_mflags} V=2
+    popd
+done
 
 
 %install
-%{__rm} -rf %{buildroot}
-%{__make} install DESTDIR="%{buildroot}"
-%find_lang gst-plugins-bad-%{majorminor}
+rm -rf $RPM_BUILD_ROOT
+for i in %{gstdirs} %{extdirs}; do
+    pushd $i
+    make install V=2 DESTDIR=$RPM_BUILD_ROOT
+    popd
+done
 
 # Clean out files that should not be part of the rpm.
-%{__rm} -f %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
-%{__rm} -f %{buildroot}%{_libdir}/*.la
+rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 
 
 %clean
-%{__rm} -rf %{buildroot}
+rm -rf $RPM_BUILD_ROOT
 
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-
-
-%files -f gst-plugins-bad-%{majorminor}.lang
+%files
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
-%{_bindir}/gst-camera
-%{_bindir}/gst-camera-perf
-%{_datadir}/gstreamer-%{majorminor}
-%{_libdir}/libgstbasevideo-%{majorminor}.so.*
-%{_libdir}/libgstphotography-%{majorminor}.so.*
-%{_libdir}/libgstsignalprocessor-%{majorminor}.so.*
+
 # Plugins without external dependencies
-%{_libdir}/gstreamer-%{majorminor}/libgstaacparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstadpcmdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgstaiff.so
-%{_libdir}/gstreamer-%{majorminor}/libgstamrparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstasfmux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstbayer.so
-%{_libdir}/gstreamer-%{majorminor}/libgstcamerabin.so
-%{_libdir}/gstreamer-%{majorminor}/libgstcdxaparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdccp.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
-%{_libdir}/gstreamer-%{majorminor}/libgstfestival.so
-%{_libdir}/gstreamer-%{majorminor}/libgstfreeze.so
-%{_libdir}/gstreamer-%{majorminor}/libgstfrei0r.so
-%{_libdir}/gstreamer-%{majorminor}/libgsth264parse.so
-%{_libdir}/gstreamer-%{majorminor}/libgsthdvparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstid3tag.so
-%{_libdir}/gstreamer-%{majorminor}/libgstlegacyresample.so
-%{_libdir}/gstreamer-%{majorminor}/libgstrfbsrc.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmpeg4videoparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegpsmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpegtsmux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmpegvideoparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmve.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmxf.so
-%{_libdir}/gstreamer-%{majorminor}/libgstnsf.so
-%{_libdir}/gstreamer-%{majorminor}/libgstnuvdemux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstpcapparse.so
-%{_libdir}/gstreamer-%{majorminor}/libgstpnm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstqtmux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstrawparse.so
 %ifarch %{ix86} x86_64
 %{_libdir}/gstreamer-%{majorminor}/libgstreal.so
 %endif
-%{_libdir}/gstreamer-%{majorminor}/libgstscaletempoplugin.so
-%{_libdir}/gstreamer-%{majorminor}/libgstsdpelem.so
-%{_libdir}/gstreamer-%{majorminor}/libgstshapewipe.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsiren.so
-%{_libdir}/gstreamer-%{majorminor}/libgstspeed.so
-%{_libdir}/gstreamer-%{majorminor}/libgststereo.so
-%{_libdir}/gstreamer-%{majorminor}/libgstsubenc.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttta.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvideomeasure.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvideosignal.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvmnc.so
-
-# System (Linux) specific plugins
-%{_libdir}/gstreamer-%{majorminor}/libgstdvb.so
-%{_libdir}/gstreamer-%{majorminor}/libgstfbdevsink.so
-%{_libdir}/gstreamer-%{majorminor}/libgstoss4audio.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvcdsrc.so
 
 # Plugins with external dependencies
-%{_libdir}/gstreamer-%{majorminor}/libgstalsaspdif.so
-%{_libdir}/gstreamer-%{majorminor}/libgstapexsink.so
-%{_libdir}/gstreamer-%{majorminor}/libgstassrender.so
-%{_libdir}/gstreamer-%{majorminor}/libgstbz2.so
-%{_libdir}/gstreamer-%{majorminor}/libgstcdaudio.so
-%{_libdir}/gstreamer-%{majorminor}/libgstcelt.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdc1394.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdfbvideosink.so
-%{_libdir}/gstreamer-%{majorminor}/libgstdirac.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdtsdec.so
 %{_libdir}/gstreamer-%{majorminor}/libgstfaad.so
-%{_libdir}/gstreamer-%{majorminor}/libgstgsm.so
-%{_libdir}/gstreamer-%{majorminor}/libgstjp2k.so
-%{_libdir}/gstreamer-%{majorminor}/libgstkate.so
-%{_libdir}/gstreamer-%{majorminor}/libgstladspa.so
-%{_libdir}/gstreamer-%{majorminor}/libgstlv2.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmms.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmetadata.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmimic.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmodplug.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg2enc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmusepack.so
-#if 0%{?fedora} >= 9
-%{_libdir}/gstreamer-%{majorminor}/libgstneonhttpsrc.so
-#endif
-%{_libdir}/gstreamer-%{majorminor}/libgstofa.so
-%{_libdir}/gstreamer-%{majorminor}/libgstrsvg.so
-%{_libdir}/gstreamer-%{majorminor}/libgstsdl.so
-%{_libdir}/gstreamer-%{majorminor}/libgstsndfile.so
-#%{_libdir}/gstreamer-%{majorminor}/libgstswfdec.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttrm.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
-%{_libdir}/gstreamer-%{majorminor}/libgstzbar.so
-%{_libdir}/gstreamer-%{majorminor}/libresindvd.so
-
-#debugging plugin
-%{_libdir}/gstreamer-%{majorminor}/libgstdebugutilsbad.so
-
-
-%files extras
-%defattr(-,root,root,-)
-# Plugins with external dependencies
-%{_libdir}/gstreamer-%{majorminor}/libgstjack.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmythtvsrc.so
-%{_libdir}/gstreamer-%{majorminor}/libgstnassink.so
-%{_libdir}/gstreamer-%{majorminor}/libgstsoundtouch.so
-%{_libdir}/gstreamer-%{majorminor}/libgsttimidity.so
-%{_libdir}/gstreamer-%{majorminor}/libgstwildmidi.so
-
-
-%files devel
-%defattr(-,root,root,-)
-%{_libdir}/libgstbasevideo-%{majorminor}.so
-%{_libdir}/libgstphotography-%{majorminor}.so
-%{_libdir}/libgstsignalprocessor-%{majorminor}.so
-%{_includedir}/gstreamer-%{majorminor}/gst/interfaces/photography*
-%{_includedir}/gstreamer-%{majorminor}/gst/signalprocessor
-%{_includedir}/gstreamer-%{majorminor}/gst/video
-
-
-%files devel-docs
-%defattr(-,root,root,-)
-%doc %{_datadir}/gtk-doc/html/gst-plugins-bad-plugins-%{majorminor}
 
 
 %changelog
+* Thu Feb  4 2010 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-4
+- Require new gstreamer-plugins-bad-free which is now in Fedora
+- Drop all files found in gstreamer-plugins-bad-free
+- Drop all subpackages (all subpackages of gstreamer-plugins-bad-free now)
+
+* Sat Dec 19 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-3
+- Disable muscbrainz / trm plugin (#1001)
+
 * Fri Dec  4 2009 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-2
 - Enable LADSPA plugins (#992)
 
