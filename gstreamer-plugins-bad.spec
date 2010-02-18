@@ -5,7 +5,11 @@
 %define gstpb_minver 0.10.22.1
 
 # which plugins to actually build and install
+%ifarch %{ix86} x86_64
 %define gstdirs gst/asfmux gst/dvdspu gst/mpegpsmux gst/mpegtsmux gst/qtmux gst/real gst/siren
+%else
+%define gstdirs gst/asfmux gst/dvdspu gst/mpegpsmux gst/mpegtsmux gst/qtmux gst/siren
+%endif
 %define extdirs ext/dts ext/faad ext/libmms ext/mimic ext/mpeg2enc ext/mplex ext/xvid
 
 Summary: GStreamer streaming media framework "bad" plug-ins
