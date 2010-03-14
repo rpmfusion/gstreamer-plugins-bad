@@ -14,8 +14,8 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.17
-Release: 4%{?dist}
+Version: 0.10.18
+Release: 1%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -112,6 +112,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Mar 14 2010 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.18-1
+- New upstream release 0.10.18
+
 * Thu Feb  4 2010 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.17-4
 - Require new gstreamer-plugins-bad-free which is now in Fedora
 - Drop all files found in gstreamer-plugins-bad-free
