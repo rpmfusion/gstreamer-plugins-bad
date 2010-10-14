@@ -15,7 +15,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.20
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -112,6 +112,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Oct 15 2010 Nicolas Chauvet <kwizart@gmail.com> - 0.10.20-2
+- Rebuilt for gcc bug
+
 * Sun Sep 12 2010 Hans de Goede <j.w.r.degoede@hhs.nl> 0.10.20-1
 - New upstream release 0.10.20
 
