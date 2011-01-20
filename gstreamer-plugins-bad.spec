@@ -6,16 +6,16 @@
 
 # which plugins to actually build and install
 %ifarch %{ix86} x86_64
-%define gstdirs gst/asfmux gst/dvdspu gst/mpegpsmux gst/mpegtsmux gst/qtmux gst/real gst/siren
+%define gstdirs gst/dvdspu gst/real gst/siren
 %else
-%define gstdirs gst/asfmux gst/dvdspu gst/mpegpsmux gst/mpegtsmux gst/qtmux gst/siren
+%define gstdirs gst/dvdspu gst/siren
 %endif
 %define extdirs ext/dts ext/faad ext/libmms ext/mimic ext/mpeg2enc ext/mplex ext/xvid
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.20
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -91,11 +91,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS COPYING README REQUIREMENTS
 
 # Plugins without external dependencies
-%{_libdir}/gstreamer-%{majorminor}/libgstasfmux.so
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmpegpsmux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstmpegtsmux.so
-%{_libdir}/gstreamer-%{majorminor}/libgstqtmux.so
 %ifarch %{ix86} x86_64
 %{_libdir}/gstreamer-%{majorminor}/libgstreal.so
 %endif
@@ -112,6 +108,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jan 20 2011 Hans de Goede <j.w.r.degoede@hhs.nl> - 0.10.20-3
+- Drop mux-es (moved to Fedora's gstreamer-plugins-bad-free)
+
 * Fri Oct 15 2010 Nicolas Chauvet <kwizart@gmail.com> - 0.10.20-2
 - Rebuilt for gcc bug
 
