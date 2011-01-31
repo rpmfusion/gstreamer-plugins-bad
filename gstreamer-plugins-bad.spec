@@ -14,8 +14,8 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.20
-Release: 3%{?dist}
+Version: 0.10.21
+Release: 1%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -108,6 +108,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jan 28 2011 Hans de Goede <j.w.r.degoede@hhs.nl> - 0.10.21-1
+- New upstream release 0.10.21
+
 * Thu Jan 20 2011 Hans de Goede <j.w.r.degoede@hhs.nl> - 0.10.20-3
 - Drop mux-es (moved to Fedora's gstreamer-plugins-bad-free)
 
