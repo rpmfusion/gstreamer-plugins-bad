@@ -10,12 +10,12 @@
 %else
 %define gstdirs gst/dvdspu gst/siren
 %endif
-%define extdirs ext/dts ext/faad ext/libmms ext/mimic ext/mpeg2enc ext/mplex ext/xvid
+%define extdirs ext/dts ext/faad ext/libmms ext/mimic ext/mpeg2enc ext/mplex ext/rtmp ext/xvid
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.21
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -40,6 +40,7 @@ BuildRequires: libmms-devel
 BuildRequires: mjpegtools-devel
 BuildRequires: twolame-devel
 BuildRequires: libmimic-devel
+BuildRequires: librtmp-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -104,10 +105,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/gstreamer-%{majorminor}/libgstmimic.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg2enc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
+%{_libdir}/gstreamer-%{majorminor}/libgstrtmp.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
 
 
 %changelog
+* Tue Mar 08 2011 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.21-2
+- Enable rtmp plugin (rf#1651)
+
 * Fri Jan 28 2011 Hans de Goede <j.w.r.degoede@hhs.nl> - 0.10.21-1
 - New upstream release 0.10.21
 
