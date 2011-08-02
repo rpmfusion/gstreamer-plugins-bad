@@ -15,12 +15,12 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.22
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Patch0: gstreamer-plugins-bad-mjpegtools-2.0.0.patch
 Requires: %{gstreamer} >= %{gst_minver}
 # Drag in the free plugins which are in Fedora now, for upgrade path
 Requires: gstreamer-plugins-bad-free >= %{version}
@@ -37,7 +37,7 @@ BuildRequires: libdca-devel
 BuildRequires: faad2-devel
 BuildRequires: xvidcore-devel
 BuildRequires: libmms-devel
-BuildRequires: mjpegtools-devel
+BuildRequires: mjpegtools-devel >= 2.0.0
 BuildRequires: twolame-devel
 BuildRequires: libmimic-devel
 BuildRequires: librtmp-devel
@@ -52,6 +52,7 @@ well enough, or the code is not of good enough quality.
 
 %prep
 %setup -q -n gst-plugins-bad-%{version}
+%patch0 -p1
 
 
 %build
@@ -72,7 +73,6 @@ done
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
 for i in %{gstdirs} %{extdirs}; do
     pushd $i
     make install V=2 DESTDIR=$RPM_BUILD_ROOT
@@ -81,10 +81,6 @@ done
 
 # Clean out files that should not be part of the rpm.
 rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
-
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 
 %files
@@ -110,6 +106,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Aug  2 2011 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.22-2
+- Rebuild for new mjpegtools-2.0.0 (rf#1841)
+
 * Tue May 17 2011 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.22-1
 - New upstream release 0.10.22
 
