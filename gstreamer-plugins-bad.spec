@@ -14,13 +14,12 @@
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
-Version: 0.10.22
-Release: 4%{?dist}
+Version: 0.10.23
+Release: 1%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
-Patch0: gstreamer-plugins-bad-mjpegtools-2.0.0.patch
 Requires: %{gstreamer} >= %{gst_minver}
 # Drag in the free plugins which are in Fedora now, for upgrade path
 Requires: gstreamer-plugins-bad-free >= %{version}
@@ -52,7 +51,6 @@ well enough, or the code is not of good enough quality.
 
 %prep
 %setup -q -n gst-plugins-bad-%{version}
-%patch0 -p1
 
 
 %build
@@ -106,6 +104,9 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 
 
 %changelog
+* Thu Jul 12 2012 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.23-1
+- New upstream release 0.10.23 (rf#2377)
+
 * Fri Mar 02 2012 Nicolas Chauvet <kwizart@gmail.com> - 0.10.22-4
 - Rebuilt for c++ ABI breakage
 
