@@ -10,12 +10,12 @@
 %else
 %define gstdirs gst/dvdspu gst/siren
 %endif
-%define extdirs ext/dts ext/faad ext/libmms ext/mimic ext/mpeg2enc ext/mplex ext/rtmp ext/xvid
+%define extdirs ext/dts ext/faad ext/libmms ext/mimic ext/mpeg2enc ext/mplex ext/rtmp ext/voamrwbenc ext/xvid
 
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.23
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -40,6 +40,7 @@ BuildRequires: mjpegtools-devel >= 2.0.0
 BuildRequires: twolame-devel
 BuildRequires: libmimic-devel
 BuildRequires: librtmp-devel
+BuildRequires: vo-amrwbenc-devel
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -84,6 +85,8 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 %files
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
+# Take the whole dir for proper dir ownership (shared with other plugin pkgs)
+%{_datadir}/gstreamer-0.10
 
 # Plugins without external dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstdvdspu.so
@@ -100,10 +103,14 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 %{_libdir}/gstreamer-%{majorminor}/libgstmpeg2enc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstmplex.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrtmp.so
+%{_libdir}/gstreamer-%{majorminor}/libgstvoamrwbenc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxvid.so
 
 
 %changelog
+* Sat Nov 10 2012 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.23-2
+- Add/enable vo-amrwbenc plugin
+
 * Thu Jul 12 2012 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.23-1
 - New upstream release 0.10.23 (rf#2377)
 
