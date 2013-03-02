@@ -15,7 +15,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.23
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -28,7 +28,6 @@ BuildRequires: %{gstreamer}-plugins-base-devel >= %{gstpb_minver}
 
 BuildRequires: check
 BuildRequires: gettext-devel
-BuildRequires: PyXML
 BuildRequires: libXt-devel
 BuildRequireS: gtk-doc
 BuildRequires: liboil-devel
@@ -108,6 +107,9 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 
 
 %changelog
+* Sat Mar  2 2013 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.23-3
+- Drop no longer needed PyXML BuildRequires (rf#2572)
+
 * Sat Nov 10 2012 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.23-2
 - Add/enable vo-amrwbenc plugin
 
