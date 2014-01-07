@@ -15,7 +15,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.23
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
@@ -107,6 +107,9 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 
 
 %changelog
+* Tue Jan 07 2014 Nicolas Chauvet <kwizart@gmail.com> - 0.10.23-5
+- Rebuilt for librtmp
+
 * Sun Nov 10 2013 Nicolas Chauvet <kwizart@gmail.com> - 0.10.23-4
 - Rebuilt for mjpegtools update to 2.1.0
 
