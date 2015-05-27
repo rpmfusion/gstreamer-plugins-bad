@@ -15,11 +15,12 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.23
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
 URL: http://gstreamer.freedesktop.org/
 Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
+Patch1: 0001-fix-faad2-version-check.patch
 Requires: %{gstreamer} >= %{gst_minver}
 # Drag in the free plugins which are in Fedora now, for upgrade path
 Requires: gstreamer-plugins-bad-free >= %{version}
@@ -40,6 +41,8 @@ BuildRequires: twolame-devel
 BuildRequires: libmimic-devel
 BuildRequires: librtmp-devel
 BuildRequires: vo-amrwbenc-devel
+# For autoreconf
+BuildRequires: libtool
 
 %description
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -51,6 +54,9 @@ well enough, or the code is not of good enough quality.
 
 %prep
 %setup -q -n gst-plugins-bad-%{version}
+%patch1 -p1
+# For patch1
+autoreconf -ivf
 
 
 %build
@@ -82,7 +88,6 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 
 
 %files
-%defattr(-,root,root,-)
 %doc AUTHORS COPYING README REQUIREMENTS
 # Take the whole dir for proper dir ownership (shared with other plugin pkgs)
 %{_datadir}/gstreamer-0.10
@@ -107,6 +112,9 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 
 
 %changelog
+* Wed May 27 2015 Hans de Goede <j.w.r.degoede@gmail.com> - 0.10.23-7
+- Add a patch from upstream fixing a faad2 crash (rf3664)
+
 * Mon Sep 01 2014 Sérgio Basto <sergio@serjux.com> - 0.10.23-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
@@ -357,7 +365,7 @@ rm %{buildroot}%{_libdir}/gstreamer-%{majorminor}/*.la
 - Re-add devel package now that we have a main shared lib and header files.
 - Add check build requirement.
 
-* Wed Mar 30 2007 Matthias Saou <http://freshrpms.net/> 0.10.4-1
+* Fri Mar 30 2007 Matthias Saou <http://freshrpms.net/> 0.10.4-1
 - Update to 0.10.4 for F7.
 - Disable swfdec... does anything/anyone even use it here? Once it stabilizes
   somewhat more, maybe then it'll be worth re-enabling.
