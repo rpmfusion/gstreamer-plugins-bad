@@ -26,7 +26,7 @@ Requires: %{gstreamer} >= %{gst_minver}
 Requires: gstreamer-plugins-bad-free >= %{version}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
 BuildRequires: %{gstreamer}-plugins-base-devel >= %{gstpb_minver}
-
+BuildRequires: gcc-c++
 BuildRequires: check
 BuildRequires: gettext-devel
 BuildRequires: libXt-devel
