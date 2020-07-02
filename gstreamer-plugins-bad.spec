@@ -18,8 +18,8 @@ Version: 0.10.23
 Release: 13%{?dist}
 License: LGPLv2+
 Group: Applications/Multimedia
-URL: http://gstreamer.freedesktop.org/
-Source: http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
+URL: https://gstreamer.freedesktop.org/
+Source: https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.bz2
 Patch1: 0001-fix-faad2-version-check.patch
 Requires: %{gstreamer} >= %{gst_minver}
 # Drag in the free plugins which are in Fedora now, for upgrade path
