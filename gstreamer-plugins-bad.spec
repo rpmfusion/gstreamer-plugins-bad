@@ -30,6 +30,8 @@ Patch11: gst-plugins-bad-0.10.23-timidity2.diff
 Patch12: 0001-vmncdec-Sanity-check-width-height-before-using-it.patch
 Patch13: 0002-h264parse-Ensure-codec_data-has-the-required-size-wh.patch
 Patch14: 0001-fix-faad2-version-check.patch
+# Fix build with make-4.3
+Patch15: %{name}-make43.patch
 
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
@@ -300,6 +302,7 @@ rm -r %{buildroot}%{_datadir}/gtk-doc
 %changelog
 * Fri Sep 04 2020 Dominik Mierzejewski <rpm@greysector.net> - 0.10.23-14
 - merge with -free from Fedora
+- fix build with make 4.3
 
 * Fri Aug 09 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 0.10.23-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
