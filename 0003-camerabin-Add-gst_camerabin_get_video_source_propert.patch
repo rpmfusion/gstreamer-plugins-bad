@@ -1,0 +1,97 @@
+From 1ef6977002ef18631f81646f198ef6a667ef8f73 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Fri, 8 Jun 2012 11:41:17 +0200
+Subject: [PATCH 3/4] camerabin: Add
+ gst_camerabin_get_video_source_properties() helper
+ function
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ gst/camerabin/gstcamerabin.c |   31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
+
+diff --git a/gst/camerabin/gstcamerabin.c b/gst/camerabin/gstcamerabin.c
+index 3f87ff9..a36d5b5 100644
+--- a/gst/camerabin/gstcamerabin.c
++++ b/gst/camerabin/gstcamerabin.c
+@@ -347,6 +347,7 @@ static void gst_camerabin_scene_mode_notify_cb (GObject * video_source,
+     GParamSpec * pspec, gpointer user_data);
+ static void gst_camerabin_zoom_notify_cb (GObject * video_source,
+     GParamSpec * pspec, gpointer user_data);
++static void gst_camerabin_get_video_source_properties (GstCameraBin * camera);
+ static void gst_camerabin_monitor_video_source_properties (GstCameraBin *
+     camera);
+ static void gst_camerabin_configure_format (GstCameraBin * camera,
+@@ -528,6 +529,8 @@ static GstCaps *camerabin_create_view_finder_caps (GstCameraBin * camera)
+         "height", G_TYPE_INT, camera->app_height, NULL);
+   }
+ 
++  gst_camerabin_get_video_source_properties (camera);
++
+   if (!camera->night_mode && camera->app_fps_n > 0 && camera->app_fps_d > 0) {
+     gst_structure_set (st,
+         "framerate", GST_TYPE_FRACTION, camera->app_fps_n,
+@@ -559,8 +562,6 @@ camerabin_setup_src_elements (GstCameraBin * camera)
+   /* clear video update status */
+   camera->video_capture_caps_update = FALSE;
+ 
+-  gst_camerabin_monitor_video_source_properties (camera);
+-
+   new_caps = camerabin_create_view_finder_caps (camera);
+ 
+   if (camera->night_mode || camera->app_fps_n <= 0 || camera->app_fps_d <= 0) {
+@@ -574,6 +575,8 @@ camerabin_setup_src_elements (GstCameraBin * camera)
+     gst_camerabin_set_allowed_framerate (camera, new_caps);
+   }
+ 
++  gst_camerabin_monitor_video_source_properties (camera);
++
+   /* Set default zoom method */
+   if (camera->src_zoom_scale) {
+     g_object_set (camera->src_zoom_scale, "method",
+@@ -2660,6 +2663,26 @@ gst_camerabin_zoom_notify_cb (GObject * video_source, GParamSpec * pspec,
+ }
+ 
+ /*
++ * gst_camerabin_monitor_get_video_source_properties:
++ * @camera: camerabin object
++ *
++ * Get properties from video source photography interface property scene mode.
++ *
++ */
++static void
++gst_camerabin_get_video_source_properties (GstCameraBin * camera)
++{
++  if (GST_IS_ELEMENT (camera->src_vid_src) &&
++      gst_element_implements_interface (camera->src_vid_src,
++          GST_TYPE_PHOTOGRAPHY)) {
++    gint scene_mode;
++    g_object_get (G_OBJECT (camera->src_vid_src), "scene-mode", &scene_mode,
++        NULL);
++    camera->night_mode = scene_mode == GST_PHOTOGRAPHY_SCENE_MODE_NIGHT;
++  }
++}
++
++/*
+  * gst_camerabin_monitor_video_source_properties:
+  * @camera: camerabin object
+  *
+@@ -2674,15 +2697,11 @@ gst_camerabin_monitor_video_source_properties (GstCameraBin * camera)
+   if (GST_IS_ELEMENT (camera->src_vid_src) &&
+       gst_element_implements_interface (camera->src_vid_src,
+           GST_TYPE_PHOTOGRAPHY)) {
+-    gint scene_mode;
+     GST_DEBUG_OBJECT (camera,
+         "connecting to %" GST_PTR_FORMAT " - notify::scene-mode",
+         camera->src_vid_src);
+     g_signal_connect (G_OBJECT (camera->src_vid_src), "notify::scene-mode",
+         (GCallback) gst_camerabin_scene_mode_notify_cb, camera);
+-    g_object_get (G_OBJECT (camera->src_vid_src), "scene-mode", &scene_mode,
+-        NULL);
+-    camera->night_mode = scene_mode == GST_PHOTOGRAPHY_SCENE_MODE_NIGHT;
+ 
+     GST_DEBUG_OBJECT (camera,
+         "connecting to %" GST_PTR_FORMAT " - notify::zoom",
+-- 
+1.7.10.2
+

@@ -30,6 +30,24 @@ index 29b10a6..ceaf31f 100644
              ], [
                faad2_minor_version=$minor
              ])
+diff --git a/configure b/configure
+index 29b10a6..ceaf31f 100644
+--- a/configure
++++ b/configure
+@@ -34232,11 +34942,11 @@
+ /* end confdefs.h.  */
+ 
+               #include <$faad_hdr>
+-              GST_CHECK_FAAD_VERSION FAAD2_VERSION
++              FAAD2_VERSION
+ 
+ _ACEOF
+ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "GST_CHECK_FAAD_VERSION \"2\.$minor\"" >/dev/null 2>&1; then :
++  $EGREP "\"2\.$minor\"$" >/dev/null 2>&1; then :
+ 
+               faad2_minor_version=$minor
+ 
 -- 
 cgit v0.10.2
 

@@ -1,0 +1,28 @@
+From 3003cbe1624cc6daa416caba9c1dce0180f3837c Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Wed, 7 Dec 2016 09:37:10 +0100
+Subject: [PATCH 2/2] h264parse: Ensure codec_data has the required size when
+ reading number of SPS
+
+https://bugzilla.gnome.org/show_bug.cgi?id=774896
+---
+ gst/videoparsers/gsth264parse.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gst/videoparsers/gsth264parse.c b/gst/videoparsers/gsth264parse.c
+index cf81657..4c14f2b 100644
+--- a/gst/videoparsers/gsth264parse.c
++++ b/gst/videoparsers/gsth264parse.c
+@@ -1605,6 +1605,9 @@ gst_h264_parse_set_caps (GstBaseParse * parse, GstCaps * caps)
+       off = nalu.offset + nalu.size;
+     }
+ 
++    if (off >= size) {
++      goto avcc_too_small;
++    }
+     num_pps = data[off];
+     off++;
+ 
+-- 
+2.9.3
+
