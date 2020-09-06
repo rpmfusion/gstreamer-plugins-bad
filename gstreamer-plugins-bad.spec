@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.23
-Release: 14%{?dist}
+Release: 15%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 URL: https://gstreamer.freedesktop.org/
@@ -31,6 +31,8 @@ Patch12: 0001-vmncdec-Sanity-check-width-height-before-using-it.patch
 Patch13: 0002-h264parse-Ensure-codec_data-has-the-required-size-wh.patch
 Patch14: 0001-fix-faad2-version-check.patch
 
+Provides: %{name}-free = %{version}-%{release}
+Obsoletes: %{name}-free < 0.10.36-15
 Requires: %{gstreamer} >= %{gst_minver}
 BuildRequires: %{gstreamer}-devel >= %{gst_minver}
 BuildRequires: %{gstreamer}-plugins-base-devel >= %{gstpb_minver}
@@ -97,6 +99,8 @@ well enough, or the code is not of good enough quality.
 Summary: Development files for the GStreamer media framework "bad" plug-ins
 Requires: %{name} = %{version}-%{release}
 Requires: gstreamer-plugins-base-devel
+Provides: %{name}-free-devel = %{version}-%{release}
+Obsoletes: %{name}-free-devel < 0.10.36-15
 
 %description devel
 GStreamer is a streaming media framework, based on graphs of elements which
@@ -298,6 +302,9 @@ rm -r %{buildroot}%{_datadir}/gtk-doc
 
 
 %changelog
+* Sun Sep 06 2020 Dominik Mierzejewski <rpm@greysector.net> - 0.10.23-15
+- add missing Provides/Obsoletes for gstreamer-plugins-bad-free{,-devel}
+
 * Fri Sep 04 2020 Dominik Mierzejewski <rpm@greysector.net> - 0.10.23-14
 - merge with -free from Fedora
 
