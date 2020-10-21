@@ -7,7 +7,7 @@
 Summary: GStreamer streaming media framework "bad" plug-ins
 Name: gstreamer-plugins-bad
 Version: 0.10.23
-Release: 15%{?dist}
+Release: 16%{?dist}
 # The freeze and nfs plugins are LGPLv2 (only)
 License: LGPLv2+ and LGPLv2
 URL: https://gstreamer.freedesktop.org/
@@ -304,6 +304,9 @@ rm -r %{buildroot}%{_datadir}/gtk-doc
 
 
 %changelog
+* Wed Oct 21 2020 Leigh Scott <leigh123linux@gmail.com> - 0.10.23-16
+- Rebuild for new libdvdread
+
 * Sun Sep 06 2020 Dominik Mierzejewski <rpm@greysector.net> - 0.10.23-15
 - add missing Provides/Obsoletes for gstreamer-plugins-bad-free{,-devel}
 
